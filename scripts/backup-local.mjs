@@ -1,0 +1,30 @@
+import 'dotenv/config';
+import { mkdir, stat, readFile, writeFile, chmod } from 'node:fs/promises';
+import { createWriteStream, createReadStream } from 'node:fs';
+import { pipeline } from 'node:stream/promises';
+import { spawn } from 'node:child_process';
+import { resolve, join } from 'node:path';
+import { createHash } from 'node:crypto';
+
+if(process.env.NODE_ENV==='production')throw new Error('Use the documented production backup procedure, not the development helper');
+const root=resolve(import.meta.dirname,'..');
+const destination=resolve(root,process.argv[2]??`var/backups/${new Date().toISOString().replaceAll(':','-')}`);
+await mkdir(destination,{recursive:true,mode:0o700});
+await chmod(destination,0o700);
+const run=async(args,output)=>{
+  const child=spawn('docker',['compose','exec','-T','postgres',...args],{cwd:root,stdio:['ignore','pipe','inherit']});
+  const completed=new Promise((ok,bad)=>{child.on('error',bad);child.on('close',code=>code===0?ok():bad(new Error(`Database backup exited ${code}`)));});
+  await Promise.all([pipeline(child.stdout,createWriteStream(output,{mode:0o600})),completed]);
+};
+const dump=join(destination,'database.dump');
+await run(['pg_dump','-U','ma_dev','-d','ma_safaris','--format=custom','--no-owner','--no-acl'],dump);
+const storage=resolve(root,process.env.LOCAL_PRIVATE_STORAGE_PATH??'var/private-storage');
+await mkdir(storage,{recursive:true,mode:0o700});
+const files=join(destination,'private-files.tar.gz');
+const tar=spawn('tar',['-czf',files,'-C',storage,'.'],{stdio:'inherit'});
+await new Promise((ok,bad)=>{tar.on('error',bad);tar.on('close',code=>code===0?ok():bad(new Error('Private file backup failed')));});
+await chmod(files,0o600);
+const checksum=async(path)=>{const h=createHash('sha256');for await(const chunk of createReadStream(path))h.update(chunk);return h.digest('hex');};
+const manifest={createdAt:new Date().toISOString(),database:'ma_safaris',postgresMajor:17,privateStorage:storage,files:{'database.dump':{sha256:await checksum(dump),bytes:(await stat(dump)).size},'private-files.tar.gz':{sha256:await checksum(files),bytes:(await stat(files)).size}}};
+await writeFile(join(destination,'manifest.json'),JSON.stringify(manifest,null,2)+'\n',{mode:0o600});
+console.log(`Database and private files backed up to ${destination}`);

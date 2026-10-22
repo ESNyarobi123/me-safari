@@ -1,0 +1,1166 @@
+generator client {
+  provider = "prisma-client"
+  output = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id String @id @default(uuid()) @db.Uuid
+  email String @unique
+  passwordHash String?
+  status String @default("ACTIVE")
+  emailVerifiedAt DateTime? @db.Timestamptz(3)
+  locale String @default("en")
+  lastLoginAt DateTime? @db.Timestamptz(3)
+  notificationPreferences Json @default("{}")
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  roles UserRoleGrant[]
+  permissionOverrides PermissionOverride[]
+  sessions Session[]
+  authTokens AuthToken[]
+  customer CustomerProfile?
+  staff StaffProfile?
+  notifications Notification[]
+  devices DeviceToken[]
+  auditEvents AuditEvent[]
+  exportJobs ExportJob[]
+}
+
+model UserRoleGrant {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  role String
+  grantedBy String? @db.Uuid
+  grantedAt DateTime @default(now()) @db.Timestamptz(3)
+  revokedAt DateTime? @db.Timestamptz(3)
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  @@index([userId, revokedAt])
+}
+
+model PermissionOverride {
+  id String @id @default(uuid()) @db.Uuid
+  userId String? @db.Uuid
+  role String?
+  action String
+  allow Boolean
+  reason String
+  actorId String @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  user User? @relation(fields: [userId], references: [id], onDelete: Restrict)
+  @@index([userId, action])
+  @@index([role, action])
+}
+
+model Session {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  refreshHash String @unique
+  familyId String @db.Uuid
+  previousId String? @unique @db.Uuid
+  expiresAt DateTime @db.Timestamptz(3)
+  revokedAt DateTime? @db.Timestamptz(3)
+  rotatedAt DateTime? @db.Timestamptz(3)
+  deviceLabel String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  previous Session? @relation("Rotation", fields: [previousId], references: [id], onDelete: Restrict)
+  next Session? @relation("Rotation")
+  devices DeviceToken[]
+  @@index([userId, expiresAt])
+  @@index([familyId])
+}
+
+model AuthToken {
+  id String @id @default(uuid()) @db.Uuid
+  userId String? @db.Uuid
+  email String?
+  purpose String
+  action String?
+  sessionId String? @db.Uuid
+  tokenHash String @unique
+  metadata Json @default("{}")
+  expiresAt DateTime @db.Timestamptz(3)
+  usedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  user User? @relation(fields: [userId], references: [id], onDelete: Restrict)
+  @@index([userId, purpose])
+}
+
+model CustomerProfile {
+  id String @id @default(uuid()) @db.Uuid
+  userId String? @unique @db.Uuid
+  name String
+  email String?
+  phone String?
+  country String?
+  preferences Json @default("{}")
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  user User? @relation(fields: [userId], references: [id], onDelete: Restrict)
+  bookings Booking[]
+  inquiries Inquiry[]
+  previews PricePreview[]
+  requests CustomRequest[]
+  reviews Review[]
+  favorites Favorite[]
+  intents PaymentIntent[]
+  supportThreads SupportThread[]
+  documents Document[]
+}
+
+model StaffProfile {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @unique @db.Uuid
+  displayName String
+  phone String?
+  languages String[] @default([])
+  capabilities String[] @default([])
+  active Boolean @default(true)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  availability StaffAvailability[]
+  assignments TripAssignment[]
+  allocations ResourceAllocation[]
+  handovers TripHandover[]
+}
+
+model StaffAvailability {
+  id String @id @default(uuid()) @db.Uuid
+  staffId String @db.Uuid
+  startsAt DateTime @db.Timestamptz(3)
+  endsAt DateTime @db.Timestamptz(3)
+  type String
+  note String?
+  visibility String @default("INTERNAL")
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  staff StaffProfile @relation(fields: [staffId], references: [id], onDelete: Restrict)
+  @@index([staffId, startsAt, endsAt])
+}
+
+model CompanySettingsVersion {
+  id String @id @default(uuid()) @db.Uuid
+  version Int @unique
+  settings Json
+  policyVersionId String? @db.Uuid
+  changedBy String? @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  policy BookingPolicyVersion? @relation(fields: [policyVersionId], references: [id], onDelete: Restrict)
+}
+
+model BookingPolicyVersion {
+  id String @id @default(uuid()) @db.Uuid
+  version Int @unique
+  depositBasisPoints Int @default(3000)
+  balanceDaysBefore Int @default(7)
+  previewMinutes Int @default(15)
+  quoteDays Int @default(7)
+  rules Json
+  effectiveAt DateTime @default(now()) @db.Timestamptz(3)
+  createdBy String? @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  bookings Booking[]
+  settings CompanySettingsVersion[]
+}
+
+model Destination {
+  id String @id @default(uuid()) @db.Uuid
+  slug String @unique
+  title String
+  description String
+  localized Json @default("{}")
+  region String?
+  gallery Json @default("[]")
+  status String @default("DRAFT")
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  packages PackageDestination[]
+  favorites Favorite[]
+}
+
+model ServiceCategory {
+  id String @id @default(uuid()) @db.Uuid
+  slug String @unique
+  title String
+  description String
+  localized Json @default("{}")
+  requestMode String @default("CUSTOM")
+  sortOrder Int @default(0)
+  status String @default("PUBLISHED")
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  packages Package[]
+  requests CustomRequest[]
+  inquiries Inquiry[]
+}
+
+model Package {
+  id String @id @default(uuid()) @db.Uuid
+  slug String @unique
+  title String
+  description String
+  categoryId String @db.Uuid
+  durationDays Int
+  localized Json @default("{}")
+  inclusions Json @default("[]")
+  exclusions Json @default("[]")
+  goodToKnow Json @default("[]")
+  cover String?
+  gallery Json @default("[]")
+  status String @default("DRAFT")
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  category ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  destinations PackageDestination[]
+  prices PackagePriceVersion[]
+  departures PackageDeparture[]
+  itineraryTemplates CatalogItineraryTemplate[]
+  previews PricePreview[]
+  bookings Booking[]
+  favorites Favorite[]
+  @@index([status, categoryId])
+}
+
+model PackageDestination {
+  id String @id @default(uuid()) @db.Uuid
+  packageId String @db.Uuid
+  destinationId String @db.Uuid
+  day Int @default(1)
+  order Int @default(1)
+  package Package @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  destination Destination @relation(fields: [destinationId], references: [id], onDelete: Restrict)
+  @@unique([packageId, destinationId, day])
+}
+
+model PackagePriceVersion {
+  id String @id @default(uuid()) @db.Uuid
+  packageId String @db.Uuid
+  version Int
+  currency String @db.Char(3)
+  adultMinor BigInt
+  childBasisPoints Int @default(7000)
+  childMinAge Int @default(0)
+  childMaxAge Int @default(15)
+  startsAt DateTime @db.Date
+  endsAt DateTime? @db.Date
+  rules Json @default("{}")
+  createdBy String? @db.Uuid
+  activeAt DateTime @default(now()) @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  package Package @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  previews PricePreview[]
+  @@unique([packageId, version, currency])
+  @@index([packageId, currency, startsAt])
+}
+
+model PackageDeparture {
+  id String @id @default(uuid()) @db.Uuid
+  packageId String @db.Uuid
+  startDate DateTime @db.Date
+  endDate DateTime @db.Date
+  capacity Int
+  status String @default("PUBLISHED")
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  package Package @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  reservations DepartureReservation[]
+  @@index([packageId, startDate])
+}
+
+model CatalogItineraryTemplate {
+  id String @id @default(uuid()) @db.Uuid
+  packageId String @db.Uuid
+  version Int
+  days Json
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  package Package @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  @@unique([packageId, version])
+}
+
+model MediaAsset {
+  id String @id @default(uuid()) @db.Uuid
+  storageKey String @unique
+  ownerId String? @db.Uuid
+  purpose String
+  mime String
+  bytes BigInt
+  width Int?
+  height Int?
+  visibility String @default("PRIVATE")
+  checksum String?
+  credit String?
+  license String?
+  status String @default("PENDING")
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([ownerId, purpose])
+}
+
+model LandingContentVersion {
+  id String @id @default(uuid()) @db.Uuid
+  version Int
+  locale String @default("en")
+  status String @default("DRAFT")
+  blocks Json
+  createdBy String? @db.Uuid
+  publishedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@unique([locale, version])
+}
+
+model Inquiry {
+  id String @id @default(uuid()) @db.Uuid
+  customerId String? @db.Uuid
+  serviceId String? @db.Uuid
+  source String
+  contact Json
+  requirements Json
+  status String @default("NEW")
+  ownerStaffId String? @db.Uuid
+  customRequestId String? @db.Uuid
+  bookingId String? @db.Uuid
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  customer CustomerProfile? @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  service ServiceCategory? @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  request CustomRequest? @relation(fields: [customRequestId], references: [id], onDelete: Restrict)
+  booking Booking? @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  @@index([status, ownerStaffId])
+}
+
+model InternalNote {
+  id String @id @default(uuid()) @db.Uuid
+  targetType String
+  targetId String @db.Uuid
+  authorId String @db.Uuid
+  body String
+  visibility String @default("INTERNAL")
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([targetType, targetId, createdAt])
+}
+
+model PricePreview {
+  id String @id @default(uuid()) @db.Uuid
+  customerId String @db.Uuid
+  packageId String? @db.Uuid
+  rateVersionId String? @db.Uuid
+  quoteId String? @db.Uuid
+  departureId String? @db.Uuid
+  startDate DateTime @db.Date
+  endDate DateTime @db.Date
+  adults Int
+  children Int @default(0)
+  childAges Json @default("[]")
+  selections Json @default("{}")
+  currency String @db.Char(3)
+  totalMinor BigInt
+  depositMinor BigInt
+  priceSnapshot Json
+  policySnapshot Json
+  requestHash String
+  expiresAt DateTime @db.Timestamptz(3)
+  consumedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  customer CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  package Package? @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  rateVersion PackagePriceVersion? @relation(fields: [rateVersionId], references: [id], onDelete: Restrict)
+  @@index([customerId, expiresAt])
+}
+
+model Booking {
+  id String @id @default(uuid()) @db.Uuid
+  customerId String @db.Uuid
+  reference String @unique
+  source String
+  packageId String? @db.Uuid
+  quoteId String? @unique @db.Uuid
+  policyVersionId String @db.Uuid
+  startDate DateTime @db.Date
+  endDate DateTime @db.Date
+  timezone String @default("Africa/Dar_es_Salaam")
+  adults Int
+  children Int @default(0)
+  status String @default("REQUESTED")
+  currency String @db.Char(3)
+  totalMinor BigInt
+  depositMinor BigInt
+  priceSnapshot Json
+  policySnapshot Json
+  requirements Json @default("{}")
+  financeException String?
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  customer CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  package Package? @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  quote QuoteVersion? @relation(fields: [quoteId], references: [id], onDelete: Restrict)
+  policy BookingPolicyVersion @relation(fields: [policyVersionId], references: [id], onDelete: Restrict)
+  travelers BookingTraveler[]
+  pickup BookingPickup?
+  lineItems BookingLineItem[]
+  reservations DepartureReservation[]
+  adjustments FinancialAdjustment[]
+  changes BookingChangeRequest[]
+  itineraryVersions ItineraryVersion[]
+  trip Trip?
+  intents PaymentIntent[]
+  postings PaymentPosting[]
+  offlinePayments OfflinePaymentRecord[]
+  refunds Refund[]
+  documents Document[]
+  supportThreads SupportThread[]
+  reviews Review[]
+  inquiries Inquiry[]
+  @@index([customerId, startDate])
+  @@index([status, startDate])
+}
+
+model BookingTraveler {
+  id String @id @default(uuid()) @db.Uuid
+  bookingId String @db.Uuid
+  lead Boolean @default(false)
+  fullName String
+  band String
+  ageYears Int?
+  language String?
+  requirements Json @default("{}")
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  @@index([bookingId])
+}
+
+model BookingPickup {
+  id String @id @default(uuid()) @db.Uuid
+  bookingId String @unique @db.Uuid
+  label String
+  address String
+  latitude Decimal? @db.Decimal(10, 7)
+  longitude Decimal? @db.Decimal(10, 7)
+  pickupAt DateTime? @db.Timestamptz(3)
+  timezone String @default("Africa/Dar_es_Salaam")
+  contact Json @default("{}")
+  approved Boolean @default(false)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+}
+
+model DepartureReservation {
+  id String @id @default(uuid()) @db.Uuid
+  departureId String @db.Uuid
+  bookingId String @db.Uuid
+  seats Int
+  state String @default("HELD")
+  expiresAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  departure PackageDeparture @relation(fields: [departureId], references: [id], onDelete: Restrict)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  @@unique([bookingId, departureId])
+  @@index([departureId, state, expiresAt])
+}
+
+model BookingLineItem {
+  id String @id @default(uuid()) @db.Uuid
+  bookingId String @db.Uuid
+  label String
+  type String
+  quantity Int
+  unitMinor BigInt
+  totalMinor BigInt
+  ruleSnapshot Json @default("{}")
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+}
+
+model FinancialAdjustment {
+  id String @id @default(uuid()) @db.Uuid
+  bookingId String @db.Uuid
+  amountMinor BigInt
+  direction String
+  currency String @db.Char(3)
+  type String
+  reason String
+  approvedBy String @db.Uuid
+  reference String @unique
+  changeRequestId String? @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+}
+
+model BookingChangeRequest {
+  id String @id @default(uuid()) @db.Uuid
+  bookingId String @db.Uuid
+  type String
+  proposed Json
+  actorId String @db.Uuid
+  status String @default("OPEN")
+  reason String
+  decisionReason String?
+  disposition Json?
+  decidedBy String? @db.Uuid
+  decidedAt DateTime? @db.Timestamptz(3)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  @@index([bookingId, status])
+}
+
+model CustomRequest {
+  id String @id @default(uuid()) @db.Uuid
+  customerId String @db.Uuid
+  serviceId String @db.Uuid
+  destinations Json @default("[]")
+  startDate DateTime? @db.Date
+  endDate DateTime? @db.Date
+  adults Int
+  children Int @default(0)
+  budgetMinor BigInt?
+  currency String @db.Char(3)
+  requirements Json
+  status String @default("SUBMITTED")
+  assignedStaffId String? @db.Uuid
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  customer CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  service ServiceCategory @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  quotes QuoteVersion[]
+  itineraryVersions ItineraryVersion[]
+  inquiries Inquiry[]
+  @@index([customerId, status])
+}
+
+model QuoteVersion {
+  id String @id @default(uuid()) @db.Uuid
+  requestId String @db.Uuid
+  versionNumber Int
+  version Int @default(1)
+  state String @default("DRAFT")
+  currency String @db.Char(3)
+  totalMinor BigInt
+  depositMinor BigInt
+  priceSnapshot Json
+  policySnapshot Json
+  itinerary Json
+  itineraryVersionId String? @db.Uuid
+  expiresAt DateTime @db.Timestamptz(3)
+  sentAt DateTime? @db.Timestamptz(3)
+  acceptedAt DateTime? @db.Timestamptz(3)
+  createdBy String @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  request CustomRequest @relation(fields: [requestId], references: [id], onDelete: Restrict)
+  lines QuoteLineItem[]
+  booking Booking?
+  documents Document[]
+  @@unique([requestId, versionNumber])
+  @@index([requestId, state])
+}
+
+model QuoteLineItem {
+  id String @id @default(uuid()) @db.Uuid
+  quoteId String @db.Uuid
+  category String
+  description String
+  quantity Int
+  unitMinor BigInt
+  totalMinor BigInt
+  customerVisible Boolean @default(true)
+  internalCostMinor BigInt?
+  quote QuoteVersion @relation(fields: [quoteId], references: [id], onDelete: Restrict)
+}
+
+model ItineraryVersion {
+  id String @id @default(uuid()) @db.Uuid
+  bookingId String? @db.Uuid
+  requestId String? @db.Uuid
+  versionNumber Int
+  version Int @default(1)
+  state String @default("DRAFT")
+  timezone String @default("Africa/Dar_es_Salaam")
+  content Json @default("{}")
+  approvedBy String? @db.Uuid
+  publishedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  booking Booking? @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  request CustomRequest? @relation(fields: [requestId], references: [id], onDelete: Restrict)
+  days ItineraryDay[]
+  trips Trip[]
+  documents Document[]
+  @@unique([bookingId, versionNumber])
+  @@unique([requestId, versionNumber])
+}
+
+model ItineraryDay {
+  id String @id @default(uuid()) @db.Uuid
+  itineraryVersionId String @db.Uuid
+  sequence Int
+  date DateTime? @db.Date
+  title String
+  accommodation String?
+  notes String?
+  visibility String @default("CUSTOMER")
+  itinerary ItineraryVersion @relation(fields: [itineraryVersionId], references: [id], onDelete: Restrict)
+  activities ItineraryActivity[]
+  @@unique([itineraryVersionId, sequence])
+}
+
+model ItineraryActivity {
+  id String @id @default(uuid()) @db.Uuid
+  dayId String @db.Uuid
+  order Int
+  title String
+  startsAt DateTime? @db.Timestamptz(3)
+  endsAt DateTime? @db.Timestamptz(3)
+  location Json @default("{}")
+  customerText String?
+  guideNotes String?
+  visibility String @default("CUSTOMER")
+  day ItineraryDay @relation(fields: [dayId], references: [id], onDelete: Restrict)
+  @@unique([dayId, order])
+}
+
+model Review {
+  id String @id @default(uuid()) @db.Uuid
+  customerId String @db.Uuid
+  bookingId String @db.Uuid
+  stars Int
+  text String
+  moderationStatus String @default("PENDING")
+  moderationReason String?
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  customer CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  @@unique([customerId, bookingId])
+}
+
+model Favorite {
+  id String @id @default(uuid()) @db.Uuid
+  customerId String @db.Uuid
+  packageId String? @db.Uuid
+  destinationId String? @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  customer CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  package Package? @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  destination Destination? @relation(fields: [destinationId], references: [id], onDelete: Restrict)
+  @@unique([customerId, packageId])
+  @@unique([customerId, destinationId])
+}
+
+model Trip {
+  id String @id @default(uuid()) @db.Uuid
+  bookingId String @unique @db.Uuid
+  reference String @unique
+  startsAt DateTime @db.Timestamptz(3)
+  endsAt DateTime @db.Timestamptz(3)
+  timezone String @default("Africa/Dar_es_Salaam")
+  status String @default("SCHEDULED")
+  itineraryVersionId String @db.Uuid
+  version Int @default(1)
+  completedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  itinerary ItineraryVersion @relation(fields: [itineraryVersionId], references: [id], onDelete: Restrict)
+  allocations ResourceAllocation[]
+  assignments TripAssignment[]
+  checklist TripChecklistItem[]
+  events TripEvent[]
+  issues TripIssue[]
+  handover TripHandover?
+  @@index([status, startsAt])
+}
+
+model Vehicle {
+  id String @id @default(uuid()) @db.Uuid
+  registration String @unique
+  type String
+  seats Int
+  luggageCapacity Int @default(0)
+  capabilities String[] @default([])
+  status String @default("ACTIVE")
+  photo String?
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  allocations ResourceAllocation[]
+  assignments TripAssignment[]
+}
+
+model ResourceAllocation {
+  id String @id @default(uuid()) @db.Uuid
+  tripId String? @db.Uuid
+  resourceType String
+  resourceId String @db.Uuid
+  guideId String? @db.Uuid
+  vehicleId String? @db.Uuid
+  startsAt DateTime @db.Timestamptz(3)
+  endsAt DateTime @db.Timestamptz(3)
+  state String @default("ACTIVE")
+  source String @default("TRIP")
+  reason String?
+  releasedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  trip Trip? @relation(fields: [tripId], references: [id], onDelete: Restrict)
+  guide StaffProfile? @relation(fields: [guideId], references: [id], onDelete: Restrict)
+  vehicle Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: Restrict)
+  @@index([tripId, state])
+  @@index([resourceType, resourceId, startsAt])
+}
+
+model TripAssignment {
+  id String @id @default(uuid()) @db.Uuid
+  tripId String @db.Uuid
+  guideId String @db.Uuid
+  vehicleId String @db.Uuid
+  guideAllocationId String @db.Uuid
+  vehicleAllocationId String @db.Uuid
+  assignedBy String @db.Uuid
+  assignedAt DateTime @default(now()) @db.Timestamptz(3)
+  endedAt DateTime? @db.Timestamptz(3)
+  replacedBy String? @db.Uuid
+  reason String?
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Restrict)
+  guide StaffProfile @relation(fields: [guideId], references: [id], onDelete: Restrict)
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Restrict)
+  @@index([guideId, endedAt])
+}
+
+model TripChecklistItem {
+  id String @id @default(uuid()) @db.Uuid
+  tripId String @db.Uuid
+  key String
+  checked Boolean @default(false)
+  note String?
+  checkedBy String? @db.Uuid
+  checkedAt DateTime? @db.Timestamptz(3)
+  version Int @default(1)
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Restrict)
+  @@unique([tripId, key])
+}
+
+model TripEvent {
+  id String @id @default(uuid()) @db.Uuid
+  tripId String @db.Uuid
+  type String
+  sequence Int
+  previousStatus String?
+  newStatus String?
+  actorId String @db.Uuid
+  activityId String? @db.Uuid
+  visibility String @default("CUSTOMER")
+  notes String?
+  actionReference String @unique
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Restrict)
+  @@unique([tripId, sequence])
+}
+
+model TripIssue {
+  id String @id @default(uuid()) @db.Uuid
+  tripId String @db.Uuid
+  reporterId String @db.Uuid
+  category String
+  severity String
+  text String
+  attachments Json @default("[]")
+  visibility String @default("INTERNAL")
+  customerSummary String?
+  status String @default("OPEN")
+  ownerStaffId String? @db.Uuid
+  resolvedAt DateTime? @db.Timestamptz(3)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Restrict)
+  @@index([tripId, status])
+}
+
+model TripHandover {
+  id String @id @default(uuid()) @db.Uuid
+  tripId String @unique @db.Uuid
+  guideId String @db.Uuid
+  notes String
+  checklist Json
+  submittedAt DateTime @default(now()) @db.Timestamptz(3)
+  actionReference String @unique
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Restrict)
+  guide StaffProfile @relation(fields: [guideId], references: [id], onDelete: Restrict)
+}
+
+model PaymentIntent {
+  id String @id @default(uuid()) @db.Uuid
+  bookingId String @db.Uuid
+  customerId String @db.Uuid
+  purpose String
+  amountMinor BigInt
+  currency String @db.Char(3)
+  provider String
+  merchantReference String @unique
+  state String @default("PENDING")
+  expiresAt DateTime @db.Timestamptz(3)
+  reservationMinor BigInt
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  customer CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  attempts PaymentAttempt[]
+  postings PaymentPosting[]
+  @@index([bookingId, state, expiresAt])
+}
+
+model PaymentAttempt {
+  id String @id @default(uuid()) @db.Uuid
+  intentId String @db.Uuid
+  provider String
+  providerTransactionId String?
+  state String @default("PENDING")
+  nextAction Json @default("{}")
+  safeMetadata Json @default("{}")
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  intent PaymentIntent @relation(fields: [intentId], references: [id], onDelete: Restrict)
+  @@unique([provider, providerTransactionId])
+}
+
+model ProviderEvent {
+  id String @id @default(uuid()) @db.Uuid
+  provider String
+  eventId String
+  verified Boolean
+  payloadHash String
+  metadata Json
+  state String @default("RECEIVED")
+  error String?
+  processedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@unique([provider, eventId])
+  @@index([state, createdAt])
+}
+
+model PaymentPosting {
+  id String @id @default(uuid()) @db.Uuid
+  bookingId String @db.Uuid
+  intentId String? @db.Uuid
+  offlineRecordId String? @unique @db.Uuid
+  amountMinor BigInt
+  currency String @db.Char(3)
+  provider String
+  providerReference String
+  settledAt DateTime @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  intent PaymentIntent? @relation(fields: [intentId], references: [id], onDelete: Restrict)
+  offlineRecord OfflinePaymentRecord? @relation(fields: [offlineRecordId], references: [id], onDelete: Restrict)
+  refunds Refund[]
+  documents Document[]
+  @@unique([provider, providerReference])
+  @@index([bookingId, settledAt])
+}
+
+model OfflinePaymentRecord {
+  id String @id @default(uuid()) @db.Uuid
+  bookingId String @db.Uuid
+  reference String @unique
+  method String
+  evidence Json
+  amountMinor BigInt
+  currency String @db.Char(3)
+  submittedBy String @db.Uuid
+  verifiedBy String? @db.Uuid
+  verifiedAt DateTime? @db.Timestamptz(3)
+  state String @default("UNVERIFIED")
+  reason String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  posting PaymentPosting?
+}
+
+model Refund {
+  id String @id @default(uuid()) @db.Uuid
+  bookingId String @db.Uuid
+  postingId String @db.Uuid
+  amountMinor BigInt
+  currency String @db.Char(3)
+  reason String
+  state String @default("REQUESTED")
+  requestedBy String @db.Uuid
+  approvedBy String? @db.Uuid
+  approvedAt DateTime? @db.Timestamptz(3)
+  providerReference String? @unique
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  posting PaymentPosting @relation(fields: [postingId], references: [id], onDelete: Restrict)
+  postings RefundPosting[]
+  @@index([postingId, state])
+}
+
+model RefundPosting {
+  id String @id @default(uuid()) @db.Uuid
+  refundId String @unique @db.Uuid
+  amountMinor BigInt
+  currency String @db.Char(3)
+  provider String
+  providerReference String
+  settledAt DateTime @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  refund Refund @relation(fields: [refundId], references: [id], onDelete: Restrict)
+  @@unique([provider, providerReference])
+}
+
+model Document {
+  id String @id @default(uuid()) @db.Uuid
+  customerId String? @db.Uuid
+  bookingId String? @db.Uuid
+  quoteId String? @db.Uuid
+  postingId String? @db.Uuid
+  itineraryVersionId String? @db.Uuid
+  ownerUserId String? @db.Uuid
+  type String
+  sourceVersion String
+  logicalKey String @unique
+  storageKey String? @unique
+  status String @default("QUEUED")
+  mime String @default("application/pdf")
+  checksum String?
+  bytes BigInt?
+  error String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  customer CustomerProfile? @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  booking Booking? @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  quote QuoteVersion? @relation(fields: [quoteId], references: [id], onDelete: Restrict)
+  posting PaymentPosting? @relation(fields: [postingId], references: [id], onDelete: Restrict)
+  itinerary ItineraryVersion? @relation(fields: [itineraryVersionId], references: [id], onDelete: Restrict)
+  exports ExportJob[]
+  @@index([customerId, createdAt])
+}
+
+model SupportThread {
+  id String @id @default(uuid()) @db.Uuid
+  customerId String @db.Uuid
+  bookingId String? @db.Uuid
+  subject String
+  status String @default("OPEN")
+  ownerStaffId String? @db.Uuid
+  participants Json @default("[]")
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  customer CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  booking Booking? @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  messages SupportMessage[]
+  @@index([customerId, status])
+}
+
+model SupportMessage {
+  id String @id @default(uuid()) @db.Uuid
+  threadId String @db.Uuid
+  authorId String @db.Uuid
+  body String
+  visibility String @default("CUSTOMER")
+  attachments Json @default("[]")
+  actionReference String? @unique
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  thread SupportThread @relation(fields: [threadId], references: [id], onDelete: Restrict)
+  @@index([threadId, createdAt])
+}
+
+model Notification {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  type String
+  resourceId String? @db.Uuid
+  title String
+  body String
+  logicalKey String @unique
+  readAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  deliveries DeliveryAttempt[]
+  @@index([userId, createdAt])
+}
+
+model DeviceToken {
+  id String @id @default(uuid()) @db.Uuid
+  userId String @db.Uuid
+  sessionId String @db.Uuid
+  deviceId String
+  platform String
+  providerToken String @unique
+  active Boolean @default(true)
+  lastSeen DateTime @default(now()) @db.Timestamptz(3)
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Restrict)
+  @@index([userId, active])
+}
+
+model DeliveryAttempt {
+  id String @id @default(uuid()) @db.Uuid
+  notificationId String? @db.Uuid
+  eventId String? @db.Uuid
+  channel String
+  logicalKey String @unique
+  state String @default("QUEUED")
+  providerMessageId String?
+  attempts Int @default(0)
+  error String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  notification Notification? @relation(fields: [notificationId], references: [id], onDelete: Restrict)
+}
+
+model AuditEvent {
+  id String @id @default(uuid()) @db.Uuid
+  actorId String? @db.Uuid
+  action String
+  entityType String
+  entityId String? @db.Uuid
+  requestId String
+  summary Json
+  reason String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  actor User? @relation(fields: [actorId], references: [id], onDelete: Restrict)
+  @@index([entityType, entityId, createdAt])
+  @@index([action, createdAt])
+}
+
+model OutboxEvent {
+  id String @id @default(uuid()) @db.Uuid
+  type String
+  aggregateId String @db.Uuid
+  aggregateVersion Int
+  logicalKey String @unique
+  payload Json
+  state String @default("PENDING")
+  attempts Int @default(0)
+  nextAttemptAt DateTime @default(now()) @db.Timestamptz(3)
+  lockedAt DateTime? @db.Timestamptz(3)
+  processedAt DateTime? @db.Timestamptz(3)
+  error String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([state, nextAttemptAt])
+}
+
+model IdempotencyRecord {
+  id String @id @default(uuid()) @db.Uuid
+  actorId String @db.Uuid
+  scope String
+  key String
+  requestHash String
+  state String @default("PROCESSING")
+  response Json?
+  responseStatus Int?
+  resourceId String? @db.Uuid
+  expiresAt DateTime @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@unique([actorId, scope, key])
+  @@index([expiresAt])
+}
+
+model ExportJob {
+  id String @id @default(uuid()) @db.Uuid
+  actorId String @db.Uuid
+  reportType String
+  filters Json
+  status String @default("QUEUED")
+  documentId String? @db.Uuid
+  expiresAt DateTime @db.Timestamptz(3)
+  error String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  actor User @relation(fields: [actorId], references: [id], onDelete: Restrict)
+  document Document? @relation(fields: [documentId], references: [id], onDelete: Restrict)
+  @@index([actorId, createdAt])
+}
+
+// SAFARI AI RENTALS — car rental and chauffeur services, a service of Me and Adventure Safaris.
+model RentalServiceLine {
+  id String @id @default(uuid()) @db.Uuid
+  slug String @unique
+  title String
+  tagline String
+  description String
+  useCases String[] @default([])
+  icon String?
+  localized Json @default("{}")
+  sortOrder Int @default(0)
+  status String @default("PUBLISHED")
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  @@index([status, sortOrder])
+}
+
+model RentalVehicle {
+  id String @id @default(uuid()) @db.Uuid
+  slug String @unique
+  brand String
+  model String
+  variant String?
+  modelYear Int?
+  category String
+  segment String
+  seats Int
+  doors Int @default(4)
+  luggageCapacity Int @default(0)
+  transmission String @default("AUTOMATIC")
+  fuel String @default("PETROL")
+  chauffeurDriven Boolean @default(true)
+  selfDriveAvailable Boolean @default(false)
+  features String[] @default([])
+  serviceSlugs String[] @default([])
+  description String?
+  status String @default("AVAILABLE")
+  photo String?
+  sortOrder Int @default(0)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  rates RentalRate[]
+  @@index([category, status])
+  @@index([segment, status])
+  @@index([status, sortOrder])
+}
+
+model RentalRate {
+  id String @id @default(uuid()) @db.Uuid
+  vehicleId String @db.Uuid
+  version Int
+  rateType String @default("DAILY")
+  currency String @db.Char(3)
+  amountMinor BigInt
+  minimumDays Int @default(1)
+  note String?
+  activeAt DateTime @default(now()) @db.Timestamptz(3)
+  createdBy String? @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  vehicle RentalVehicle @relation(fields: [vehicleId], references: [id], onDelete: Restrict)
+  @@unique([vehicleId, version, rateType, currency])
+  @@index([vehicleId, rateType, currency])
+}
+
+model RentalPolicyVersion {
+  id String @id @default(uuid()) @db.Uuid
+  version Int @unique
+  status String @default("DRAFT")
+  policy Json
+  createdBy String? @db.Uuid
+  publishedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+}

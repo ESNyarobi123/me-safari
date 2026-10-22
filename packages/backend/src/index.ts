@@ -1,0 +1,24 @@
+import { createDatabase,type PrismaClient } from '@ma/database';
+import { AuthService } from './auth.js';
+import { CommerceService } from './commerce.js';
+import { FinanceService } from './finance.js';
+import { TripService } from './trips.js';
+import { AdminService } from './admin.js';
+import { SharedService } from './shared.js';
+import { CatalogService } from './catalog.js';
+import { InquiryService } from './inquiries.js';
+import { RentalService } from './rentals.js';
+export function createBackend(db:PrismaClient=createDatabase()) {const auth=new AuthService(db),commerce=new CommerceService(db,auth),trips=new TripService(db,auth),finance=new FinanceService(db,commerce,auth),admin=new AdminService(db,auth,commerce,trips),shared=new SharedService(db,commerce,trips),catalog=new CatalogService(db),rentals=new RentalService(db),inquiries=new InquiryService(db);return {db,auth,commerce,trips,finance,admin,shared,catalog,rentals,inquiries};}
+export type Backend=ReturnType<typeof createBackend>;
+export { config, isAllowedWebOrigin, privateStoragePath } from './config.js';
+export { DomainError } from './errors.js';
+export * from './permissions.js';
+export * from './money.js';
+export type {Actor,Command,Tx} from './core.js';
+export {fail,requireValue,checkVersion} from './errors.js';
+export {allowed,customer,staff,transaction,pagination,audit,emit} from './core.js';
+export {bookingInclude,paymentSummary,safeItinerary} from './commerce.js';
+export {InquiryService,inquiryRecord,hashIp,INQUIRY_SOURCES,UTM_KEYS,type PublicInquiryInput,type InquiryAttribution,type InquiryRequestMeta} from './inquiries.js';
+export {SnippePaymentAdapter,normalizeTzPhone,maskPhone,type SnippeOptions} from './snippe.js';
+export {createPaymentAdapter,reconcilePendingPayments,reconcileVerifiedEvent,type PaymentAdapter,type VerifiedPaymentEvent} from './finance.js';
+export {Prisma} from '@ma/database';

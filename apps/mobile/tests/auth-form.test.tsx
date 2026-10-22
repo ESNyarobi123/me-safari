@@ -1,0 +1,10 @@
+import React from 'react';
+import {render,screen,fireEvent,waitFor} from '@testing-library/react-native';
+import {Login} from '../src/features/Auth';
+import {request} from '../src/lib/api';
+import {queryClient,useSession} from '../src/lib/session';
+import {QueryClientProvider} from '@tanstack/react-query';
+jest.mock('../src/lib/api',()=>({request:jest.fn(),errorInfo:(e:Error)=>({message:e.message,code:'NETWORK_ERROR',details:{}})}));
+beforeEach(()=>{jest.clearAllMocks();});
+test('invalid login stays in the form and does not send credentials',async()=>{await render(<QueryClientProvider client={queryClient}><Login/></QueryClientProvider>);await fireEvent.press(screen.getByTestId('sign-in'));await waitFor(()=>expect(screen.getByText('Enter a valid email address.')).toBeTruthy());expect(request).not.toHaveBeenCalled();});
+test('network failure keeps the entered email and exposes uncertain status guidance',async()=>{jest.mocked(request).mockRejectedValue(new Error('Check your connection and try again.'));await render(<QueryClientProvider client={queryClient}><Login/></QueryClientProvider>);await fireEvent.changeText(screen.getByTestId('email'),'alice@example.test');await fireEvent.changeText(screen.getByTestId('password'),'a-long-valid-password');await fireEvent.press(screen.getByTestId('sign-in'));await waitFor(()=>expect(screen.getByText('Check status before retrying.')).toBeTruthy());expect(screen.getByTestId('email').props.value).toBe('alice@example.test');expect(request).toHaveBeenCalledWith('/auth/login','POST',{email:'alice@example.test',password:'a-long-valid-password'});});

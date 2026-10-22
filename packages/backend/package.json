@@ -1,0 +1,7 @@
+{
+  "name":"@ma/backend","version":"0.1.0","private":true,"type":"module",
+  "exports":{".":{"types":"./src/index.ts","production":"./dist/index.js","default":"./src/index.ts"},"./jobs":{"types":"./src/jobs.ts","production":"./dist/jobs.js","default":"./src/jobs.ts"},"./config":{"types":"./src/config.ts","production":"./dist/config.js","default":"./src/config.ts"}},
+  "scripts":{"typecheck":"tsc --noEmit","build":"tsc"},
+  "dependencies":{"@ma/database":"workspace:*","@nestjs/jwt":"12.0.2","argon2":"0.45.1","zod":"4.6.5","bullmq":"6.3.12","ioredis":"5.8.2","pdfkit":"0.20.2","nodemailer":"7.0.10","dotenv":"17.2.3"},
+  "devDependencies":{"@types/pdfkit":"0.17.3","@types/nodemailer":"7.0.4"}
+}

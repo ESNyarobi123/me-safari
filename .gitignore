@@ -1,0 +1,22 @@
+node_modules/
+.tools/
+.env
+.env.local
+.env.*.local
+!*.example
+var/
+.expo/
+.next/
+dist/
+out/
+coverage/
+test-results/
+playwright-report/
+*.tsbuildinfo
+apps/mobile/ios/
+apps/mobile/android/
+packages/database/src/generated/
+.DS_Store
+safari
+meand safari/
+tmp/

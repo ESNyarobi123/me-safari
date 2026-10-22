@@ -1,0 +1,19 @@
+const paths: Record<string, string> = {
+ compass: 'M20 12a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM16 8l-3 5-5 3 3-5 5-3Z',
+ heart: 'M20 5c-3-3-6-1-8 1-2-2-5-4-8-1-4 4 0 9 8 15 8-6 12-11 8-15Z',
+ mountain: 'm2 20 8-16 6 12 3-7 4 11H2Zm5-10 3 3 3-3',
+ sun: 'M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5',
+ people: 'M12 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM3 21v-3a6 6 0 0 1 12 0v3m1-17a3 3 0 0 1 0 6m2 4c3 1 4 3 4 7',
+ car: 'm4 10 2-5h12l2 5M3 10h18v9H3V10Zm2 9v2m14-2v2M6 14h2m8 0h2M9 17h6',
+ briefcase: 'M5 7h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2ZM8 7V3h8v4M3 12h18m-11 0v3h4v-3',
+ sparkles: 'm12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3ZM3 3v4M1 5h4m15 14v4m-2-2h4',
+ leaf: 'M20 4C9 2 3 9 5 16c2 7 15 5 15-12ZM4 21l12-12',
+ arrow: 'M4 12h16m-6-6 6 6-6 6',
+ binoculars: 'M4 9h5v10H3V9l2-5h3l1 5m6 0h5v10h-6V9l1-5h3l2 5M9 12h6M9 16h6',
+ 'map-pin': 'M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Zm0-9a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z',
+ calendar: 'M7 3v3m10-3v3M4 9h16M6 5h12a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm2 8h2v2H8v-2Zm6 0h2v2h-2v-2Zm-6 4h2v2H8v-2Zm6 0h2v2h-2v-2Z',
+ search: 'M11 3a8 8 0 1 0 5.3 14l4 4 1.4-1.4-4-4A8 8 0 0 0 11 3Zm0 2a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z',
+ bag: 'M7 7V6a5 5 0 0 1 10 0v1h3l1 13H3L4 7h3Zm2 0h6V6a3 3 0 0 0-6 0v1Zm-4.2 2-.6 9h15.6l-.6-9H4.8Z',
+ play: 'M8 5v14l11-7L8 5Z',
+};
+export default function Icon({ name }: { name: string }) { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d={paths[name] || paths.compass}/></svg>; }

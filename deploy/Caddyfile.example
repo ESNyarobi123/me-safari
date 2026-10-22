@@ -1,0 +1,53 @@
+# Example Caddy configuration. Replace example.com and paths before use.
+# Validate with: caddy validate --config /etc/caddy/Caddyfile
+{
+	email ops@example.com
+}
+
+app.example.com {
+	root * /srv/ma-safaris/web
+	encode zstd gzip
+
+	# Hashed Next.js assets and supplied imagery are immutable.
+	@immutable path /_next/static/* /assets/*
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+	# Every document response, including trailing-slash portal routes, stays out
+	# of shared caches. Assets above are the only long-lived responses.
+	@document not path /_next/static/* /assets/*
+	header @document Cache-Control "no-store"
+	header @document Pragma "no-cache"
+
+	try_files {path} {path}/index.html
+	file_server {
+		hide .git .env* .DS_Store
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "geolocation=(), microphone=(), camera=()"
+		-Server
+	}
+}
+
+api.example.com {
+	encode zstd gzip
+	request_body {
+		max_size 16MB
+	}
+
+	reverse_proxy 127.0.0.1:4000 {
+		health_uri /v1/health/ready
+		health_interval 30s
+		health_timeout 5s
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+}

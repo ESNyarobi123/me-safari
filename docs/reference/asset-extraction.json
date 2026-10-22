@@ -1,0 +1,62 @@
+[
+  {
+    "file": "fonts/dm-sans.woff2",
+    "mime": "font/woff2",
+    "bytes": 36932,
+    "sha256": "9fea608a947e67020c33cad9a6fe3d60c54119dfb8cff87768a8117a15ed7543"
+  },
+  {
+    "file": "fonts/manrope.woff2",
+    "mime": "font/woff2",
+    "bytes": 24836,
+    "sha256": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972"
+  },
+  {
+    "file": "fonts/playfair-display.woff2",
+    "mime": "font/woff2",
+    "bytes": 38404,
+    "sha256": "e0c764a8e9e1cce92163c55bac4b2ad6cd4cf8c696ce2289ab5c41565e65b7e2"
+  },
+  {
+    "file": "fonts/playfair-display-italic.woff2",
+    "mime": "font/woff2",
+    "bytes": 38804,
+    "sha256": "54af24bd0f911f0fd7399d5445ea2023ff501d6a69f2d728f1213072f977ab14"
+  },
+  {
+    "file": "brand-logo.png",
+    "mime": "image/png",
+    "bytes": 21930,
+    "sha256": "a92e42efa121ff6055070ef5481af82472c85d9d83ddc733293c168891893063"
+  },
+  {
+    "file": "hero.jpg",
+    "mime": "image/jpeg",
+    "bytes": 358610,
+    "sha256": "bbeb563cda984fee7043f050b8e627410da54c57c7ddd354acf29fdacfa15629"
+  },
+  {
+    "file": "safari.jpg",
+    "mime": "image/jpeg",
+    "bytes": 841021,
+    "sha256": "79797036d377ab084353e664723217a22255515f10467d5823f522e88984b18e"
+  },
+  {
+    "file": "zanzibar.jpg",
+    "mime": "image/jpeg",
+    "bytes": 139262,
+    "sha256": "37ba177c7f10b74ac9e0a57e197a5540a1c80c60180d4f3cd815327e7b769785"
+  },
+  {
+    "file": "kilimanjaro.jpg",
+    "mime": "image/jpeg",
+    "bytes": 635257,
+    "sha256": "0921b4ad965e4bde9251e25a20a09d0870546aa3dfb41a245ce32fd8577eafc6"
+  },
+  {
+    "file": "vehicle.jpg",
+    "mime": "image/jpeg",
+    "bytes": 460096,
+    "sha256": "4ed997d54cb5a5561a9e6567843a23a7c34d94b15dff2d5fe12aee5df89562d1"
+  }
+]

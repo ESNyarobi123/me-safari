@@ -1,0 +1,21 @@
+import Constants from 'expo-constants';
+import NetInfo from '@react-native-community/netinfo';
+import * as SecureStore from 'expo-secure-store';
+import * as Crypto from 'expo-crypto';
+import {createClient} from '@ma-safaris/sdk';
+import {useMutation,useQuery} from '@tanstack/react-query';
+import {queryClient,refreshKey,singleFlight,useSession} from './session';
+import type {LoginResult,RecordData} from './domain';
+export const apiUrl=String(Constants.expoConfig?.extra?.apiUrl??process.env.EXPO_PUBLIC_API_URL??process.env.EXPO_PUBLIC_API_BASE_URL??'http://localhost:4000/v1').replace(/\/$/,'');
+export const client=createClient({baseUrl:apiUrl,getAccessToken:()=>useSession.getState().accessToken,getRole:()=>useSession.getState().role});
+type Method='GET'|'POST'|'PATCH'|'PUT'|'DELETE';
+export const refreshSession=singleFlight(async()=>{const token=await SecureStore.getItemAsync(refreshKey);if(!token)throw new Error('SESSION_REVOKED');const result=await client.request<LoginResult>('/auth/refresh','POST',{refreshToken:token});await useSession.getState().setSession(result);return result;});
+export function errorInfo(error:unknown):{code:string;message:string;requestId?:string;details:RecordData;status?:number} {const e=error as {code?:string;message?:string;status?:number;requestId?:string;details?:RecordData};return {code:e.code??'NETWORK_ERROR',message:e.message??'Check your connection and try again.',status:e.status,requestId:e.requestId,details:e.details??{}};}
+export async function request<T>(path:string,method:Method='GET',body?:unknown,options?:{idempotencyKey?:string;reauthToken?:string}):Promise<T>{const accessAtStart=useSession.getState().accessToken;try{return await client.request<T>(path,method,body,options);}catch(error){if(errorInfo(error).status===401&&!path.startsWith('/auth/')){try{if(useSession.getState().accessToken===accessAtStart)await refreshSession();return await client.request<T>(path,method,body,options);}catch(refreshError){await useSession.getState().clear();throw refreshError;}}if(errorInfo(error).code==='ROLE_CONTEXT_DENIED'){queryClient.clear();}throw error;}}
+export async function restoreSession():Promise<void>{try{const token=await SecureStore.getItemAsync(refreshKey);if(token)await refreshSession();}catch{await useSession.getState().clear();}finally{useSession.getState().ready();}}
+export function useResource<T=RecordData>(path:string,options:{public?:boolean;poll?:number;enabled?:boolean}={}){const user=useSession(s=>s.user);const role=useSession(s=>s.role);return useQuery({queryKey:options.public?['public',path]:['private',user?.id,role,path],queryFn:()=>request<T>(path),enabled:(options.public||!!user)&&(options.enabled??true),refetchInterval:options.poll});}
+/** Scope+payload hash restores the same idempotency key after an uncertain network response. */
+async function commandKey(path:string,body:unknown){const {user,role}=useSession.getState();const hash=await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256,JSON.stringify([user?.id,role,path,body]));const slot=`ma-safaris.pending.${hash}`;let key=await SecureStore.getItemAsync(slot);if(!key){key=Crypto.randomUUID();await SecureStore.setItemAsync(slot,key);}return {slot,key};}
+export async function command<T>(path:string,body:unknown,method:Method='POST',reauthToken?:string):Promise<T>{const connection=await NetInfo.fetch();if(connection.isConnected===false)throw new Error('Offline commands are unavailable. Your inputs have been retained.');const pending=await commandKey(path,body);try{const data=await request<T>(path,method,body,{idempotencyKey:pending.key,reauthToken});await SecureStore.deleteItemAsync(pending.slot);return data;}catch(error){const status=errorInfo(error).status;if(status&&status<500&&status!==408&&status!==429)await SecureStore.deleteItemAsync(pending.slot);throw error;}}
+export function useCommand<T=RecordData>(path:string,method:Method='POST'){return useMutation({mutationFn:(body:unknown)=>command<T>(path,body,method),onSuccess:()=>{void queryClient.invalidateQueries();}});}
+export async function logout(all=false){try{await request(all?'/auth/logout-all':'/auth/logout','POST');}finally{await useSession.getState().clear();}}

@@ -1,0 +1,991 @@
+/* ==========================================================================
+   M&A Safaris — Admin console theme
+   Tailwind CSS v4 + HeroUI v3, themed with the M&A Safaris brand palette.
+   This file is imported ONLY by the /admin route tree so that it can never
+   collide with the marketing site styles (both define `.button`, `.switch`…).
+   ========================================================================== */
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url('/assets/fonts/dm-sans.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/assets/fonts/manrope.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('/assets/fonts/playfair-display.woff2') format('woff2');
+}
+
+@import 'tailwindcss';
+@import '@heroui/styles/css';
+
+/* --------------------------------------------------------------------------
+   Tailwind design tokens
+   -------------------------------------------------------------------------- */
+@theme {
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-ui: 'Manrope', 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+
+  --color-brand-orange: #ff7b00;
+  --color-brand-orange-bright: #ff9526;
+  --color-brand-orange-soft: #fff2e5;
+  --color-brand-orange-ink: #a94700;
+  --color-brand-navy: #0a2540;
+  --color-brand-navy-soft: #eef3f8;
+  --color-brand-teal: #0d7c79;
+  --color-brand-teal-soft: #e8f5f5;
+  --color-brand-teal-ink: #085856;
+  --color-brand-ink: #171915;
+  --color-brand-cream: #f6f3ed;
+  --color-brand-peach: #fff2e5;
+  --color-brand-paper: #fffdfa;
+  --color-brand-line: #e6dfd3;
+  --color-brand-muted: #5e6358;
+
+  --animate-rise: rise 0.5s cubic-bezier(0.32, 0.72, 0, 1) both;
+  --animate-pop: pop 0.35s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Brand theme — light
+   Unlayered rules win over HeroUI's `@layer base` variables.
+   -------------------------------------------------------------------------- */
+:root {
+  --radius: 1rem;
+  --field-radius: 0.875rem;
+  --field-border-width: 1px;
+
+  /* base — Landing Page Cream & Navy/Ink */
+  --background: #f6f3ed;
+  --foreground: #0a2540;
+
+  /* surfaces — Crisp Paper & Warm Peach/Cream */
+  --surface: #fffdfa;
+  --surface-foreground: #0a2540;
+  --surface-secondary: #faf6ee;
+  --surface-secondary-foreground: #0a2540;
+  --surface-tertiary: #fff2e5;
+  --surface-tertiary-foreground: #0a2540;
+
+  --overlay: #fffdfa;
+  --overlay-foreground: #0a2540;
+
+  --muted: #5e6358;
+  --default: #f3ede2;
+  --default-foreground: #0a2540;
+
+  /* brand accent = signal orange */
+  --accent: #ff7b00;
+  --accent-foreground: #ffffff;
+
+  --success: #0d7c79;
+  --success-foreground: #ffffff;
+  --warning: #b45309;
+  --warning-foreground: #ffffff;
+  --danger: #e11d48;
+  --danger-foreground: #ffffff;
+
+  --segment: #fffdfa;
+  --segment-foreground: #0a2540;
+
+  /* lines */
+  --border: #e6dfd3;
+  --separator: #ebe4d8;
+  --separator-secondary: #e2dacb;
+  --separator-tertiary: #d8cebd;
+  --border-secondary: #ded5c5;
+  --border-tertiary: #c9beab;
+
+  --focus: #ff7b00;
+  --link: #0d7c79;
+
+  /* fields */
+  --field-background: #fffdfa;
+  --field-foreground: #0a2540;
+  --field-placeholder: #8a8f82;
+  --field-border: #dfd8ca;
+
+  --backdrop: rgba(10, 37, 64, 0.45);
+
+  --surface-shadow:
+    0 2px 6px rgba(10, 37, 64, 0.04),
+    0 18px 42px -18px rgba(10, 37, 64, 0.11),
+    0 0 0 1px rgba(10, 37, 64, 0.05);
+  --overlay-shadow:
+    0 4px 12px -2px rgba(10, 37, 64, 0.12),
+    0 24px 52px -18px rgba(10, 37, 64, 0.24);
+  --field-shadow: 0 2px 6px rgba(10, 37, 64, 0.04);
+}
+
+:root[data-theme='dark'],
+.dark {
+  --background: #07111d;
+  --foreground: #f6f3ed;
+
+  --surface: #0d1d30;
+  --surface-foreground: #f6f3ed;
+  --surface-secondary: #11243a;
+  --surface-secondary-foreground: #f6f3ed;
+  --surface-tertiary: #162c46;
+  --surface-tertiary-foreground: #f6f3ed;
+
+  --overlay: #102238;
+  --overlay-foreground: #f6f3ed;
+
+  --muted: #9fb0c4;
+  --default: #162b44;
+  --default-foreground: #f6f3ed;
+
+  --accent: #ff8b20;
+  --accent-foreground: #ffffff;
+
+  --success: #14b8a6;
+  --success-foreground: #042f2e;
+  --warning: #f59e0b;
+  --warning-foreground: #1a1405;
+  --danger: #fb7185;
+  --danger-foreground: #1a0705;
+
+  --segment: #162c46;
+  --segment-foreground: #f6f3ed;
+
+  --border: #1e3552;
+  --separator: #192e47;
+  --separator-secondary: #213a58;
+  --separator-tertiary: #294669;
+  --border-secondary: #223b59;
+  --border-tertiary: #2f4e73;
+
+  --field-background: #0f2136;
+  --field-foreground: #f6f3ed;
+  --field-placeholder: #7990ab;
+  --field-border: #213a58;
+
+  --backdrop: rgba(4, 10, 18, 0.68);
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+html {
+  scroll-padding-top: 6rem;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--accent) 28%, transparent);
+  color: var(--foreground);
+}
+
+/* Slim, unobtrusive scrollbars inside the console. */
+.admin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+.admin-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.admin-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--foreground) 18%, transparent);
+  border-radius: 999px;
+}
+.admin-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Decorative depth for the login screen / empty states. */
+.admin-aurora {
+  background:
+    radial-gradient(60rem 32rem at 12% -10%, color-mix(in oklab, var(--accent) 22%, transparent), transparent 62%),
+    radial-gradient(48rem 28rem at 100% 0%, color-mix(in oklab, #0d7c79 20%, transparent), transparent 58%),
+    linear-gradient(180deg, var(--background), var(--background));
+}
+
+.admin-grid-lines {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Soft brand pill used in the sidebar / headers. */
+.brand-dot {
+  background: linear-gradient(135deg, #ff7b00, #ff8b20 55%, #ffab5e);
+}
+
+/* ==========================================================================
+   Hero UI Admin Login Page — Landing Page Color Combo & Pedestal Stage
+   ========================================================================== */
+.admin-login-shell {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at 84% 12%, rgba(255, 123, 0, 0.14) 0%, transparent 40%),
+    radial-gradient(circle at 12% 78%, rgba(255, 242, 229, 0.95) 0%, transparent 48%),
+    linear-gradient(180deg, #f6f3ed 0%, #fff2e5 52%, #f6f3ed 100%);
+  color: #171915;
+  display: flex;
+  flex-direction: column;
+}
+:root[data-theme='dark'] .admin-login-shell,
+.dark .admin-login-shell {
+  background:
+    radial-gradient(circle at 84% 12%, rgba(255, 123, 0, 0.16) 0%, transparent 42%),
+    radial-gradient(circle at 12% 78%, rgba(13, 124, 121, 0.14) 0%, transparent 48%),
+    linear-gradient(180deg, #0a1624 0%, #07111d 100%);
+  color: #f6f3ed;
+}
+
+.admin-login-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(246, 243, 237, 0.88);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(10, 37, 64, 0.08);
+}
+:root[data-theme='dark'] .admin-login-topbar,
+.dark .admin-login-topbar {
+  background: rgba(10, 22, 36, 0.86);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.admin-login-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px 6px 16px;
+  border-radius: 999px;
+  background: #fffdfa;
+  border: 1px solid rgba(255, 123, 0, 0.22);
+  color: #a94700;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 10px 24px rgba(255, 123, 0, 0.1);
+}
+:root[data-theme='dark'] .admin-login-badge,
+.dark .admin-login-badge {
+  background: rgba(255, 253, 250, 0.08);
+  color: #ffb366;
+}
+.admin-login-badge-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #0a2540;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+}
+
+.admin-login-h1 {
+  font-family: var(--font-ui);
+  font-size: clamp(34px, 4vw, 52px);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  font-weight: 800;
+  color: #0a2540;
+}
+:root[data-theme='dark'] .admin-login-h1,
+.dark .admin-login-h1 {
+  color: #fffdfa;
+}
+.admin-login-h1 em {
+  font-style: normal;
+  color: #ff7b00;
+}
+
+/* Circular Hero Plate + Orange Pedestal on Login Left Stage */
+.admin-hero-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 22px;
+}
+.admin-hero-plate {
+  position: relative;
+  width: 256px;
+  height: 256px;
+  border-radius: 50%;
+  background: #fffdfa;
+  padding: 14px;
+  box-shadow:
+    0 28px 64px rgba(10, 37, 64, 0.16),
+    0 4px 14px rgba(10, 37, 64, 0.06);
+  z-index: 2;
+}
+.admin-hero-plate-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid rgba(255, 123, 0, 0.22);
+}
+.admin-hero-plate-inner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.admin-hero-orb {
+  position: absolute;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: #fffdfa;
+  padding: 4px;
+  box-shadow: 0 16px 32px rgba(10, 37, 64, 0.18);
+  z-index: 3;
+}
+.admin-hero-orb img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.admin-hero-orb span {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #0a2540;
+  color: #fff;
+  border: 2px solid #fffdfa;
+  display: grid;
+  place-items: center;
+}
+.admin-hero-orb-a { top: 4px; right: 16%; }
+.admin-hero-orb-b { bottom: 86px; right: 10%; }
+
+.admin-hero-offer {
+  position: absolute;
+  left: 2%;
+  bottom: 78px;
+  z-index: 4;
+  width: 236px;
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: #fffdfa;
+  border: 1px solid rgba(10, 37, 64, 0.08);
+  box-shadow: 0 22px 44px rgba(10, 37, 64, 0.18);
+  color: #171915;
+}
+.admin-hero-offer-tag {
+  position: absolute;
+  top: -22px;
+  left: 12px;
+  padding: 4px 10px;
+  border-radius: 10px 10px 10px 3px;
+  background: #e11d48;
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 16px rgba(225, 29, 72, 0.28);
+}
+.admin-hero-offer-thumb {
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  padding: 3px;
+  background: linear-gradient(145deg, #ff7b00, #ff9526);
+  overflow: hidden;
+}
+.admin-hero-offer-thumb img {
+  width: 100%;
+  height: 100%;
+  border-radius: 9px;
+  object-fit: cover;
+}
+
+.admin-hero-pedestal {
+  margin-top: -36px;
+  padding-top: 46px;
+  width: 100%;
+  max-width: 470px;
+  border-radius: 26px;
+  background: linear-gradient(145deg, #ff7b00 0%, #ff8c1a 58%, #ff9526 100%);
+  box-shadow: 0 24px 52px rgba(255, 123, 0, 0.28);
+  overflow: hidden;
+  z-index: 1;
+}
+.admin-hero-pedestal-bar {
+  margin: 0;
+  padding: 8px 14px;
+  background: #0a2540;
+  color: #fff;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  font-weight: 800;
+}
+.admin-hero-pedestal-pills {
+  padding: 12px 12px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.admin-hero-pedestal-pills span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: #0c0d0b;
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 800;
+}
+.admin-hero-pedestal-pills i {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #ff7b00;
+  color: #fff;
+  font-style: normal;
+  font-size: 9px;
+  display: grid;
+  place-items: center;
+}
+
+/* Sign-In Card on the Right */
+.admin-signin-card {
+  position: relative;
+  border-radius: 34px;
+  background: #fffdfa;
+  border: 1.5px solid rgba(10, 37, 64, 0.08);
+  box-shadow:
+    0 32px 72px rgba(10, 37, 64, 0.14),
+    0 6px 18px rgba(255, 123, 0, 0.08);
+  padding: 34px 32px 28px;
+  color: #171915;
+}
+:root[data-theme='dark'] .admin-signin-card,
+.dark .admin-signin-card {
+  background: #102033;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f6f3ed;
+}
+.admin-signin-tag {
+  position: absolute;
+  top: -13px;
+  left: 28px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff7b00, #ff9526);
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 10px 20px rgba(255, 123, 0, 0.28);
+}
+.admin-signin-submit {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, #ff7b00 0%, #ff9526 100%) !important;
+  color: #ffffff !important;
+  font-family: var(--font-ui) !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  box-shadow: 0 18px 36px rgba(255, 123, 0, 0.3) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  transition: transform 0.18s ease, box-shadow 0.18s ease !important;
+}
+.admin-signin-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 44px rgba(255, 123, 0, 0.38) !important;
+}
+.admin-signin-submit-arrow {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #0a2540;
+  color: #fff;
+  display: grid;
+  place-items: center;
+}
+
+@media (max-width: 640px) {
+  .admin-signin-card {
+    padding: 28px 20px 22px;
+    border-radius: 28px;
+  }
+  .admin-hero-offer {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    margin-top: -28px;
+    margin-bottom: 12px;
+    width: min(280px, 100%);
+  }
+  .admin-hero-pedestal {
+    margin-top: 0;
+    padding-top: 0;
+  }
+}
+
+/* ==========================================================================
+   Hero UI Admin Console Shell, Sidebar, Topbar & Shared Surfaces
+   Matches the Landing Page Color Combo (#F6F3ED, #FFFDFA, #FFF2E5, #0A2540, #FF7B00)
+   ========================================================================== */
+
+.admin-console-shell {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at 88% 8%, rgba(255, 123, 0, 0.1) 0%, transparent 36%),
+    radial-gradient(circle at 12% 72%, rgba(255, 242, 229, 0.92) 0%, transparent 45%),
+    radial-gradient(circle at 60% 94%, rgba(13, 124, 121, 0.06) 0%, transparent 38%),
+    linear-gradient(180deg, #f6f3ed 0%, #fff2e5 52%, #f6f3ed 100%);
+  color: var(--foreground);
+}
+:root[data-theme='dark'] .admin-console-shell,
+.dark .admin-console-shell {
+  background:
+    radial-gradient(circle at 88% 8%, rgba(255, 123, 0, 0.14) 0%, transparent 38%),
+    radial-gradient(circle at 14% 76%, rgba(13, 124, 121, 0.12) 0%, transparent 44%),
+    linear-gradient(180deg, #07111d 0%, #0a1829 52%, #07111d 100%);
+}
+
+/* Elevated Hero Sidebar Dock */
+.admin-sidebar-dock {
+  background: linear-gradient(180deg, #fffdfa 0%, #faf5ed 58%, #fffdfa 100%);
+  border-right: 1.5px solid rgba(10, 37, 64, 0.08);
+  box-shadow: 12px 0 36px -18px rgba(10, 37, 64, 0.1);
+}
+:root[data-theme='dark'] .admin-sidebar-dock,
+.dark .admin-sidebar-dock {
+  background: linear-gradient(180deg, #0b192b 0%, #0d1f35 60%, #091524 100%);
+  border-right-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 12px 0 36px -18px rgba(0, 0, 0, 0.5);
+}
+
+/* Sidebar Mini Orange + Navy Pedestal Card */
+.admin-sidebar-pedestal {
+  margin: 0 12px 12px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #ff7b00 0%, #ff9526 100%);
+  box-shadow: 0 14px 28px -10px rgba(255, 123, 0, 0.35);
+  overflow: hidden;
+}
+.admin-sidebar-pedestal-bar {
+  padding: 6px 10px;
+  background: #0a2540;
+  color: #ffffff;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.admin-sidebar-pedestal-body {
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  color: #ffffff;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* Sidebar Navigation Links */
+.admin-nav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 16px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+  color: #3d4852;
+  border: 1px solid transparent;
+  transition: all 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+:root[data-theme='dark'] .admin-nav-link,
+.dark .admin-nav-link {
+  color: #b7c5d6;
+}
+.admin-nav-link:hover {
+  background: #fff2e5;
+  border-color: rgba(255, 123, 0, 0.2);
+  color: #0a2540;
+  transform: translateX(2px);
+}
+:root[data-theme='dark'] .admin-nav-link:hover,
+.dark .admin-nav-link:hover {
+  background: rgba(255, 123, 0, 0.12);
+  border-color: rgba(255, 123, 0, 0.25);
+  color: #ffffff;
+}
+.admin-nav-link.is-active {
+  background: #0a2540;
+  border-color: #0a2540;
+  color: #ffffff;
+  box-shadow: 0 12px 24px -10px rgba(10, 37, 64, 0.36);
+}
+:root[data-theme='dark'] .admin-nav-link.is-active,
+.dark .admin-nav-link.is-active {
+  background: linear-gradient(135deg, #ff7b00 0%, #ff9526 100%);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  box-shadow: 0 12px 24px -10px rgba(255, 123, 0, 0.4);
+}
+.admin-nav-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  background: #f6f3ed;
+  border: 1px solid rgba(10, 37, 64, 0.07);
+  color: #0a2540;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: all 0.18s ease;
+}
+:root[data-theme='dark'] .admin-nav-icon,
+.dark .admin-nav-icon {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+}
+.admin-nav-link:hover .admin-nav-icon {
+  background: #fffdfa;
+  color: #ff7b00;
+  border-color: rgba(255, 123, 0, 0.25);
+}
+.admin-nav-link.is-active .admin-nav-icon {
+  background: linear-gradient(135deg, #ff7b00 0%, #ff9526 100%);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 6px 14px rgba(255, 123, 0, 0.38);
+}
+:root[data-theme='dark'] .admin-nav-link.is-active .admin-nav-icon,
+.dark .admin-nav-link.is-active .admin-nav-icon {
+  background: #0a2540;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+/* Sticky Topbar Glass */
+.admin-topbar-glass {
+  background: rgba(255, 253, 250, 0.86);
+  backdrop-filter: blur(16px);
+  border-bottom: 1.5px solid rgba(10, 37, 64, 0.08);
+  box-shadow: 0 8px 28px -18px rgba(10, 37, 64, 0.1);
+}
+:root[data-theme='dark'] .admin-topbar-glass,
+.dark .admin-topbar-glass {
+  background: rgba(11, 25, 43, 0.86);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Hero UI Page Header Card (powers all 26 console pages) */
+.admin-page-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 96% 12%, rgba(255, 123, 0, 0.14) 0%, transparent 38%),
+    radial-gradient(circle at 4% 92%, rgba(255, 242, 229, 0.9) 0%, transparent 45%),
+    linear-gradient(135deg, #fffdfa 0%, #faf6ee 58%, #fff2e5 100%);
+  border: 1.5px solid rgba(10, 37, 64, 0.08);
+  box-shadow:
+    0 22px 48px -22px rgba(10, 37, 64, 0.12),
+    0 4px 12px rgba(255, 123, 0, 0.06);
+  padding: 22px 26px;
+}
+:root[data-theme='dark'] .admin-page-hero,
+.dark .admin-page-hero {
+  background:
+    radial-gradient(circle at 96% 12%, rgba(255, 123, 0, 0.18) 0%, transparent 40%),
+    linear-gradient(135deg, #0d1d30 0%, #11253d 60%, #152c47 100%);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-eyebrow-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px 4px 12px;
+  border-radius: 999px;
+  background: #fffdfa;
+  border: 1px solid rgba(255, 123, 0, 0.24);
+  color: #a94700;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  box-shadow: 0 6px 16px rgba(255, 123, 0, 0.1);
+}
+:root[data-theme='dark'] .admin-eyebrow-pill,
+.dark .admin-eyebrow-pill {
+  background: rgba(255, 253, 250, 0.08);
+  color: #ffb366;
+}
+.admin-eyebrow-pill-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0a2540;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+}
+
+/* Dashboard Hero Stage (Circular Plate + Orange Pedestal) */
+.admin-dash-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at 86% 18%, rgba(255, 123, 0, 0.16) 0%, transparent 40%),
+    radial-gradient(circle at 12% 88%, rgba(13, 124, 121, 0.08) 0%, transparent 42%),
+    linear-gradient(135deg, #fffdfa 0%, #faf5ed 54%, #fff2e5 100%);
+  border: 1.5px solid rgba(10, 37, 64, 0.09);
+  box-shadow:
+    0 28px 64px -24px rgba(10, 37, 64, 0.15),
+    0 6px 18px rgba(255, 123, 0, 0.08);
+  padding: 28px 30px;
+}
+:root[data-theme='dark'] .admin-dash-hero,
+.dark .admin-dash-hero {
+  background:
+    radial-gradient(circle at 86% 18%, rgba(255, 123, 0, 0.2) 0%, transparent 42%),
+    linear-gradient(135deg, #0d1d30 0%, #10233a 58%, #152b46 100%);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-dash-plate {
+  position: relative;
+  width: 176px;
+  height: 176px;
+  border-radius: 50%;
+  background: #fffdfa;
+  padding: 10px;
+  box-shadow:
+    0 22px 48px rgba(10, 37, 64, 0.18),
+    0 4px 12px rgba(10, 37, 64, 0.06);
+  z-index: 2;
+}
+.admin-dash-plate-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid rgba(255, 123, 0, 0.26);
+}
+.admin-dash-plate-inner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.admin-dash-pedestal {
+  margin-top: -26px;
+  padding-top: 34px;
+  width: 100%;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #ff7b00 0%, #ff8c1a 58%, #ff9526 100%);
+  box-shadow: 0 20px 44px rgba(255, 123, 0, 0.28);
+  overflow: hidden;
+  z-index: 1;
+}
+.admin-dash-pedestal-bar {
+  margin: 0;
+  padding: 6px 12px;
+  background: #0a2540;
+  color: #ffffff;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+.admin-dash-pedestal-grid {
+  padding: 10px 10px 12px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+.admin-dash-pedestal-stat {
+  border-radius: 12px;
+  background: #0c0d0b;
+  color: #ffffff;
+  padding: 7px 8px;
+  text-align: center;
+}
+
+/* Elevated StatCard */
+.admin-stat-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px !important;
+  background: #fffdfa !important;
+  border: 1.5px solid rgba(10, 37, 64, 0.08) !important;
+  box-shadow:
+    0 18px 38px -18px rgba(10, 37, 64, 0.11),
+    0 2px 8px rgba(255, 123, 0, 0.04) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+}
+:root[data-theme='dark'] .admin-stat-card,
+.dark .admin-stat-card {
+  background: #0d1d30 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+.admin-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 123, 0, 0.28) !important;
+  box-shadow:
+    0 24px 48px -18px rgba(10, 37, 64, 0.16),
+    0 6px 16px rgba(255, 123, 0, 0.1) !important;
+}
+.admin-stat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3.5px;
+  background: linear-gradient(90deg, #ff7b00, #ff9526 55%, #0a2540);
+  opacity: 0.9;
+}
+
+/* Elevated Panel Card */
+.admin-panel-card {
+  border-radius: 26px !important;
+  background: #fffdfa !important;
+  border: 1.5px solid rgba(10, 37, 64, 0.08) !important;
+  box-shadow:
+    0 20px 44px -20px rgba(10, 37, 64, 0.11),
+    0 3px 10px rgba(10, 37, 64, 0.03) !important;
+  overflow: hidden;
+}
+:root[data-theme='dark'] .admin-panel-card,
+.dark .admin-panel-card {
+  background: #0d1d30 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+.admin-panel-header {
+  background: linear-gradient(180deg, rgba(255, 242, 229, 0.45) 0%, rgba(255, 253, 250, 0) 100%);
+  border-bottom: 1px solid rgba(10, 37, 64, 0.08);
+}
+:root[data-theme='dark'] .admin-panel-header,
+.dark .admin-panel-header {
+  background: linear-gradient(180deg, rgba(255, 123, 0, 0.07) 0%, transparent 100%);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Elevated Filter Bar */
+.admin-filter-card {
+  border-radius: 22px;
+  background: linear-gradient(135deg, #fffdfa 0%, #faf6ee 100%);
+  border: 1.5px solid rgba(10, 37, 64, 0.08);
+  box-shadow: 0 14px 32px -18px rgba(10, 37, 64, 0.1);
+  padding: 12px 16px;
+}
+:root[data-theme='dark'] .admin-filter-card,
+.dark .admin-filter-card {
+  background: #0d1d30;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* HeroUI Primary Button & Table Polish inside Admin Console */
+.admin-console-shell .button--primary,
+.admin-login-shell .button--primary {
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff7b00 0%, #ff9526 100%);
+  color: #ffffff;
+  font-family: var(--font-ui);
+  font-weight: 800;
+  box-shadow: 0 12px 24px -8px rgba(255, 123, 0, 0.38);
+}
+.admin-console-shell .button--primary:hover {
+  filter: brightness(1.03);
+  box-shadow: 0 16px 30px -8px rgba(255, 123, 0, 0.48);
+}
+.admin-console-shell .button--tertiary,
+.admin-console-shell .button--secondary {
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+}
+
+.admin-table-wrap th {
+  background: #faf5ed;
+  color: #0a2540;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+:root[data-theme='dark'] .admin-table-wrap th,
+.dark .admin-table-wrap th {
+  background: #11243a;
+  color: #cbd5e1;
+}
+.admin-table-wrap tr:hover td {
+  background: rgba(255, 123, 0, 0.045);
+}
+
+
+

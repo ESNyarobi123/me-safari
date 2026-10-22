@@ -1,0 +1,13 @@
+diff --git a/package.json b/package.json
+index ef1d345f89491ffae974b7c7b7682faca36566e4..1b04d2865c0b8e769a8e0c2694542450be12c1ab 100644
+--- a/package.json
++++ b/package.json
+@@ -51,7 +51,7 @@
+     "build": "prebuildify --napi --strip --tag-armv --tag-libc",
+     "fmt": "oxfmt",
+     "fmt:check": "oxfmt --check",
+-    "install": "cross-env ZERO_AR_DATE=1 node-gyp-build",
++    "install": "node -e ''",
+     "lint": "oxlint",
+     "lint:fix": "oxlint --fix",
+     "prepare": "tsc",

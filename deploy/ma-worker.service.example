@@ -1,0 +1,45 @@
+# Example systemd unit. Adjust paths, user and Node binary for the host.
+# Validate with: systemd-analyze verify /etc/systemd/system/ma-worker.service
+[Unit]
+Description=M&A Safaris outbox worker
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=ma-safaris
+Group=ma-safaris
+WorkingDirectory=/opt/ma-safaris
+EnvironmentFile=/etc/ma-safaris/worker.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node --conditions=production apps/worker/dist/main.js
+Restart=on-failure
+RestartSec=3
+KillSignal=SIGTERM
+TimeoutStopSec=30
+UMask=0077
+LimitNOFILE=65535
+
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectClock=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ReadWritePaths=/var/lib/ma-safaris
+StateDirectory=ma-safaris
+StateDirectoryMode=0700
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+RemoveIPC=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target

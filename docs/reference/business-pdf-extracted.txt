@@ -1,0 +1,413 @@
+PAGE 1
+M&A Safaris - Web & Mobile Application Project Overview   |   Discussion Draft
+M&A SAFARIS
+Web & Mobile Application
+Project Overview and Role-Based Features
+Me and Adventure Safaris
+Purpose
+A simple functional document describing the proposed system, its main modules, 
+user roles, permissions, website features, mobile application features, and key 
+operating flows for client review and discussion.
+Prepared for project discussion - August 2026
+
+PAGE 2
+M&A Safaris - Web & Mobile Application Project Overview   |   Discussion Draft
+1. Project Overview
+M&A Safaris is proposed as a complete digital platform for Me and Adventure Safaris. The platform will support the full 
+customer journey from discovering Tanzania travel experiences to booking, payment, itinerary management, trip operations, 
+and post-trip follow-up.
+The solution should not be treated as only a tourism website. It is better classified as a:
+Recommended System Classification
+Safari Booking & Tour Operations Management Platform
+The platform combines customer-facing sales and booking features with internal tools required to organize and deliver safari 
+trips.
+Platform Area Primary Purpose
+Public Website Marketing, destinations, safari packages, inquiries, custom safari 
+requests, and online booking.
+Customer Mobile App / Portal Manage bookings, payments, travelers, itinerary, trip updates, 
+documents, support, and profile.
+Operations Web Dashboard Manage customers, bookings, custom itineraries, schedules, 
+vehicles, drivers/guides, and trip preparation.
+Admin Dashboard Control the entire platform, staff access, packages, payments, 
+reports, website content, and system settings.
+Driver / Guide App or Staff Portal View assigned trips, pickup details, itinerary, customer information 
+required for the trip, and update trip progress.
+2. Main Business Services Supported
+Based on the current M&A Safaris company profile, the system should be flexible enough to support multiple travel products 
+and services, including:
+ Wildlife safaris and game drives
+ Private and group safari packages
+ Honeymoon and romantic getaways
+ Family and luxury safaris
+ Cultural and community experiences
+ Mount Kilimanjaro adventures
+ Day trips and excursions
+ Airport transfers
+ Car rental and chauffeur services
+ Customized and tailor-made itineraries
+ Corporate and group travel
+ Beach and Zanzibar holidays
+The platform should also allow the company to publish and manage destinations such as Arusha, Tarangire, Lake Manyara, 
+Ngorongoro, Serengeti, Mount Kilimanjaro, Zanzibar, Mikumi, Udzungwa Mountains, and future destinations.
+3. Recommended User Roles
+For the first version, four core roles are recommended. Additional roles can be introduced later through permissions without 
+redesigning the entire platform.
+Role Primary Responsibility
+Admin Full business and system control.
+Operations / Booking Staff Manage inquiries, customers, bookings, quotations, itineraries, trip 
+preparation, and assignments.
+
+PAGE 3
+M&A Safaris - Web & Mobile Application Project Overview   |   Discussion Draft
+Role Primary Responsibility
+Driver / Tour Guide Manage only assigned trips and provide operational trip updates.
+Customer / Tourist Discover experiences, request or book trips, pay, manage travelers, 
+and follow their itinerary.
+Important Role Design Rule
+A traveler or passenger does not need to be a separate system role. One Customer account may make a booking for 
+several travelers. The additional travelers are stored under the booking and do not necessarily need user accounts.
+4. Role 1 - Admin
+The Admin is the highest operational role. The Admin manages the company platform, staff access, commercial content, 
+bookings, operations, payments, and reporting.
+Admin - Core Features
+Dashboard
+ View total bookings, pending bookings, confirmed bookings and cancellations.
+ View revenue summaries and payment status.
+ View upcoming, active and completed trips.
+ View customer, staff and vehicle summaries.
+Customer Management
+ View all customer profiles and booking history.
+ View inquiries and customer notes.
+ Update customer information where authorized.
+ Activate, suspend or deactivate customer accounts.
+Booking Management
+ Create bookings manually.
+ View and edit all bookings.
+ Confirm, reschedule, cancel or update booking status.
+ Approve custom safari requests and quotations.
+ Assign operations staff, driver/guide and vehicle.
+Safari Packages & Destinations
+ Create, edit, publish, unpublish or archive safari packages.
+ Set pricing, duration, inclusions, exclusions and itinerary.
+ Manage destination pages, activities, images and descriptions.
+Custom Safari Management
+ Review custom trip requests.
+ Prepare itinerary and quotation.
+ Set pricing and send offers to customers.
+ Approve final custom trip arrangements.
+Fleet & Staff
+ Add and manage vehicles.
+ Set vehicle availability or maintenance status.
+ Create and manage staff accounts.
+ Assign drivers and guides to trips.
+ Manage role permissions.
+Payments & Reports
+ View transactions and balances.
+ Confirm approved manual/offline payments where applicable.
+
+PAGE 4
+M&A Safaris - Web & Mobile Application Project Overview   |   Discussion Draft
+ Initiate or review refunds according to company policy.
+ View booking, revenue, customer, package, destination, staff and vehicle reports.
+Content & Settings
+ Manage website pages, services, gallery, testimonials and contact information.
+ Manage company policies, currencies, taxes, notifications and booking settings.
+ Manage integrations such as payment, email or SMS services.
+Admin - Restrictions and Security Controls
+ Admin should never be able to view customer passwords.
+ Full payment card credentials must never be stored or displayed in the platform.
+ Completed financial records should not be silently edited or deleted.
+ Sensitive changes should create audit logs showing who changed what and when.
+ Audit logs should not be deletable through normal Admin operations.
+5. Role 2 - Operations / Booking Staff
+Operations / Booking Staff manage the daily customer and trip preparation workflow. This role may represent a booking 
+officer, tour consultant, reservations officer, or operations staff member depending on the company structure.
+Operations / Booking Staff - Core Features
+Daily Dashboard
+ View new inquiries and custom safari requests.
+ View pending quotations and payments.
+ View upcoming arrivals, departures and active trips.
+ View tasks requiring operational action.
+Customer & Inquiry Management
+ View relevant customer profiles and booking history.
+ Create customer records when booking by phone, WhatsApp or office.
+ Add internal customer notes and special requests.
+ Communicate with customers through supported channels.
+Booking Management
+ Create and update bookings.
+ Prepare and send quotations.
+ Confirm bookings after required conditions are met.
+ Reschedule trips and process cancellation requests according to policy.
+ Update booking status.
+Itinerary Management
+ Create day-by-day itineraries.
+ Add destinations, pickup points, activities, accommodation and notes.
+ Edit itinerary before final confirmation.
+ Send the approved itinerary to the customer.
+Trip Preparation
+ Check trip requirements.
+ Assign an available vehicle.
+ Assign driver and/or tour guide.
+ Record pickup location and time.
+ Record traveler requirements such as dietary, accessibility or language needs.
+Customer Communication
+ Send booking confirmations.
+ Send payment reminders.
+ Send itinerary updates.
+ Send pre-trip and operational notifications.
+
+PAGE 5
+M&A Safaris - Web & Mobile Application Project Overview   |   Discussion Draft
+Operations / Booking Staff - Cannot Do
+ Create or promote users to Admin unless explicitly permitted.
+ Change payment gateway credentials or security settings.
+ Delete financial transaction history.
+ Delete audit logs.
+ Change company-wide permissions without authorization.
+ Modify completed payment values manually.
+ Access financial or management reports that are outside their assigned permission scope.
+6. Role 3 - Driver / Tour Guide
+The Driver / Tour Guide interface should be intentionally simple. The role should only access information required to deliver 
+assigned trips safely and efficiently.
+Driver / Tour Guide - Core Features
+My Trips
+ View today's assigned trip.
+ View upcoming assigned trips.
+ View completed assignments.
+Assigned Trip Details
+ Booking reference.
+ Lead customer name and permitted contact information.
+ Number of travelers.
+ Pickup location and pickup time.
+ Destination and day-by-day itinerary.
+ Assigned vehicle.
+ Emergency or operations contact.
+ Relevant special requirements.
+Trip Status Updates
+ Assigned / Scheduled.
+ Driving to pickup.
+ Customer picked up.
+ Trip or safari started.
+ Destination reached or activity in progress.
+ Return journey.
+ Trip completed.
+Operational Actions
+ Report a vehicle issue.
+ Report customer no-show or delay.
+ Contact Operations.
+ Add trip notes.
+ Upload approved trip evidence or photos if enabled.
+Driver / Tour Guide - Cannot Do
+ View customers or trips not assigned to them.
+ View company revenue or financial reports.
+ Change safari package prices.
+ Create or delete safari packages.
+ Manage payments or refunds.
+ Delete bookings.
+ Manage other staff accounts.
+ Change system settings or permissions.
+
+PAGE 6
+M&A Safaris - Web & Mobile Application Project Overview   |   Discussion Draft
+Access Principle
+A Driver or Tour Guide should normally see only the minimum customer and trip information required for assignments that 
+are currently assigned to them.
+7. Role 4 - Customer / Tourist
+The Customer / Tourist is the main user of the website and mobile application. The customer experience should remain 
+simple: Discover -> Plan -> Book -> Pay -> Travel.
+Customer / Tourist - Core Features
+Explore & Discover
+ Browse destinations, safari packages and travel services.
+ Search or filter by destination, duration, safari type, travel style or budget.
+ View package photos, highlights, itinerary, inclusions, exclusions and pricing.
+Booking
+ Select travel dates.
+ Select number of adults and children.
+ Choose available package options.
+ Add pickup information or optional services.
+ Submit booking request or complete online booking depending on the booking model.
+Traveler Management
+ Add one or more travelers under a booking.
+ Store traveler names and required travel information.
+ Update allowed traveler details before the trip cutoff date.
+Custom Safari Builder
+ Select preferred destinations.
+ Enter travel dates or expected travel period.
+ Enter group size and budget range.
+ Choose travel style such as budget, mid-range or luxury.
+ Add special requests and submit a custom safari request.
+Payments
+ Pay deposit or full amount when supported.
+ View paid amount and remaining balance.
+ View payment status and transaction history.
+ Download receipt or payment confirmation.
+My Trips
+ View upcoming, active and completed trips.
+ View booking status.
+ View itinerary, pickup details and accommodation information.
+ View trip-related documents and updates where enabled.
+ Contact M&A Safaris support or operations.
+Profile & Communication
+ Manage account profile.
+ Manage preferred contact details.
+ Receive booking, payment and trip notifications.
+ Submit reviews or feedback after the trip.
+Customer / Tourist - Cannot Do
+ View another customer's bookings or personal data.
+ Change confirmed package pricing.
+
+PAGE 7
+M&A Safaris - Web & Mobile Application Project Overview   |   Discussion Draft
+ Assign vehicles, drivers or guides.
+ Access internal staff notes.
+ Change booking status directly outside the allowed customer actions.
+ Mark their own payment as paid.
+ Access Admin or Operations tools.
+8. Main System Modules
+The following modules form the recommended functional scope of the full web and mobile platform.
+Module What It Should Cover
+Public Website / CMS Home, about, services, destinations, packages, gallery, testimonials, 
+contact, travel information, policies, SEO content.
+Package Management Package title, price, duration, itinerary, destinations, inclusions, 
+exclusions, images, availability, published status.
+Destination Management Destination information, activities, images, packages connected to 
+the destination, travel guidance.
+Booking Engine Travel date, group size, package options, booking request, 
+confirmation, status, cancellation/reschedule rules.
+Custom Safari Builder Customer requirements, selected destinations, duration, budget, 
+travel style, special requests, quotation and approval.
+Customer CRM Customer profiles, inquiries, notes, booking history, communication 
+history and repeat-customer information.
+Traveler Management Multiple travelers under one booking, traveler details and special 
+requirements.
+Itinerary Management Day-by-day trip plan, activities, destinations, accommodation, pickup 
+details and customer-visible itinerary.
+Trip Operations Trip schedule, assignments, operational status, internal notes and 
+trip completion.
+Fleet Management Vehicles, availability, maintenance status, schedules and 
+assignments.
+Driver / Guide Management Staff profiles, availability, assigned trips and trip status updates.
+Payments Deposit/full payment, balances, payment status, receipts, refunds 
+and financial history.
+Notifications Email, SMS, push or WhatsApp integration where approved for 
+booking, payment and trip updates.
+Reports Bookings, revenue, payments, customers, packages, destinations, 
+staff activity and vehicle utilization.
+RBAC & Security Roles, permissions, audit logs, secure authentication, protected 
+financial actions and data access controls.
+9. Recommended Web vs Mobile Feature Distribution
+The website, customer app and staff tools do not need to duplicate every feature. Each interface should focus on the tasks 
+that are most useful for that user.
+Interface Recommended Focus
+Public Website Discover M&A Safaris, destinations, services, packages, custom 
+safari request, inquiries, booking, trust content and contact.
+
+PAGE 8
+M&A Safaris - Web & Mobile Application Project Overview   |   Discussion Draft
+Interface Recommended Focus
+Customer App My Trips, booking status, itinerary, payments, travelers, trip updates, 
+support, documents and notifications.
+Admin / Operations Web Dashboard All management functions, booking desk, itinerary creation, trip 
+planning, staff/vehicle assignments, reports and content 
+management.
+Driver / Guide Mobile App or Mobile Web Assigned trips, pickup, itinerary, customer details required for the 
+trip, operational updates and issue reporting.
+10. Key End-to-End Workflows
+A. Standard Safari Booking
+1.  Customer discovers package.
+2.  Customer selects dates and travelers.
+3.  Customer submits booking or pays required amount.
+4.  Booking is created.
+5.  Operations reviews and confirms the booking.
+6.  Itinerary is finalized.
+7.  Vehicle and Driver/Guide are assigned.
+8.  Customer receives final trip details.
+9.  Trip starts and operational status is updated.
+10.  Trip is completed and customer receives follow-up/review request.
+B. Custom Safari Request
+1.  Customer selects destinations, dates, group size, budget and travel style.
+2.  Customer submits request.
+3.  Operations reviews the request.
+4.  Operations prepares itinerary and quotation.
+5.  Customer reviews the proposal and requests changes or accepts.
+6.  Final pricing and itinerary are confirmed.
+7.  Customer makes required payment.
+8.  Booking moves into normal trip preparation and operations flow.
+C. Trip Operations
+1.  Confirmed booking enters the operations schedule.
+2.  Operations confirms accommodation, pickup and trip requirements.
+3.  Available vehicle is assigned.
+4.  Driver and/or guide is assigned.
+5.  Assigned staff sees the trip in My Trips.
+6.  Driver/Guide updates trip progress.
+7.  Operations monitors exceptions or issues.
+8.  Trip is marked completed and retained in customer and operational history.
+11. High-Level Permission Matrix
+Feature Area Admin Operations Driver/Guide Customer
+View all bookings Yes Yes / permitted scope No No
+Manage own booking Yes Yes No Yes
+
+PAGE 9
+M&A Safaris - Web & Mobile Application Project Overview   |   Discussion Draft
+Feature Area Admin Operations Driver/Guide Customer
+Create/edit packages Yes Optional permission No No
+Manage destinations Yes Optional permission No No
+Prepare itinerary Yes Yes View assigned View own
+Assign vehicle / staff Yes Yes No No
+Update trip progress Yes Yes Yes - assigned only View own
+Manage payments Yes Limited No Own payments only
+View financial reports Yes Limited permission No No
+Manage staff / roles Yes No No No
+Manage website content Yes Optional permission No No
+System settings Yes No No No
+12. Recommended First Version (MVP)
+To keep the first release focused and practical, the first version can prioritize the features required to sell trips and operate 
+confirmed bookings. More advanced automation can be added later.
+ Public website with services, destinations and package pages.
+ Customer registration/login and profile.
+ Safari package management.
+ Booking request / booking management.
+ Custom safari request form and quotation workflow.
+ Traveler management.
+ Itinerary builder and customer itinerary view.
+ Payment integration or payment-status management.
+ Admin and Operations dashboards.
+ Vehicle and Driver/Guide management.
+ Trip assignment and status updates.
+ Customer My Trips area.
+ Basic notifications.
+ Basic business reports.
+ Role-based permissions and audit logs.
+Possible Later Enhancements
+ Live vehicle location / GPS tracking.
+ Hotel and supplier partner portal.
+ Advanced accounting integration.
+ Automatic dynamic pricing.
+ Multi-language content.
+ Offline mode for drivers/guides in low-connectivity areas.
+ Digital vouchers, travel documents and e-signatures.
+ Advanced CRM automation and marketing campaigns.
+ AI-assisted itinerary suggestions, subject to business approval.
+
+PAGE 10
+M&A Safaris - Web & Mobile Application Project Overview   |   Discussion Draft
+13. Items to Confirm With the Client Before Development
+The following decisions should be confirmed with M&A Safaris before final UI/UX design and backend development begin:
+ Should customers book instantly, request a quotation first, or support both models?
+ Which payment methods and currencies should be supported?
+ Is a deposit required, full payment required, or both?
+ What is the cancellation and rescheduling policy?
+ Should car rental be booked independently from safari packages?
+ Should Driver and Tour Guide be one combined role or two separate roles?
+ Which staff members are allowed to confirm bookings and payments?
+ Does M&A Safaris need hotel/accommodation management inside the system?
+ Which customer documents are required before travel?
+ Which notifications are required: email, SMS, push notification, WhatsApp, or a combination?
+ Does the company need real-time vehicle tracking in the first version?
+ Which reports are most important to management?
+ Will the mobile application be customer-only, or should staff and drivers also use the same app with role-based screens?
+Recommended Next Discussion
+Confirm the booking model, payment flow, staff workflow, Driver/Guide workflow, and the exact features required in the first 
+release. After those decisions, the project can move into UI/UX screens, database design, APIs, and implementation 
+planning.
+END OF DISCUSSION DOCUMENT

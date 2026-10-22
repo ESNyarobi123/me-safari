@@ -1,0 +1,15 @@
+packages:
+  - apps/*
+  - packages/*
+allowBuilds:
+  '@prisma/engines': true
+  prisma: true
+  argon2: true
+  esbuild: true
+  sharp: true
+  '@parcel/watcher': true
+  msgpackr-extract: true
+  unrs-resolver: true
+  '@scarf/scarf': false
+patchedDependencies:
+  argon2@0.45.1: patches/argon2@0.45.1.patch
