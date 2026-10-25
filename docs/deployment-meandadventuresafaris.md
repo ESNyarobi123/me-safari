@@ -88,6 +88,25 @@ ANDROID_HOME=~/Library/Android/sdk JAVA_HOME=$(/usr/libexec/java_home -v 17) \
   ./gradlew assembleRelease
 ```
 
+## Catalogue data
+
+Two idempotent seeds fill the live site. Both refuse to run unless `NODE_ENV=production` and
+never create demo people, bookings or payments, so they are safe to re-run after a restore:
+
+```bash
+cd /opt/ma-safaris
+# Services, destinations, the three signature journeys, rental lines and policy.
+NODE_ENV=production node --env-file=/etc/ma-safaris/api.env \
+  --import tsx packages/database/scripts/seed-catalog.ts
+# Safari AI Rentals fleet: 32 chauffeur-driven vehicles with daily TZS rates.
+NODE_ENV=production node --env-file=/etc/ma-safaris/api.env \
+  --import tsx packages/database/scripts/seed-rental-fleet.ts
+```
+
+The web export bakes the published catalogue into the static HTML (via `lib/seo-catalog.ts`),
+so re-run `pnpm build:web` and republish a release after seeding for numbers, fleet cards and
+service copy to appear before hydration.
+
 ## Accounts
 
 `packages/database/scripts/create-admin.ts` creates or repairs a staff account without ever
@@ -110,7 +129,7 @@ DATABASE_URL='postgresql://ma_owner:<owner-pw>@127.0.0.1:5432/ma_safaris' \
 | Email | Loopback Postfix (`mail.meandadventuresafaris.com` in `/etc/hosts`) with direct-to-MX delivery and no SPF/DKIM | Move to a real SMTP provider (host, port 587, user, password), then remove the hosts entry. Deliverability is not guaranteed before that. |
 | Private storage | `STORAGE_DRIVER=local` under `/var/lib/ma-safaris/private-storage` | Object storage with encryption at rest before customer document uploads are promoted. |
 | `www` host | No DNS record | Add a `www` CNAME/A record, then extend the Caddyfile with a redirect site block. |
-| Backups | Manual (`scripts/backup-production.mjs`) | Install a timer + offsite encrypted copy and restore-test once. |
+| Backups | Nightly `pg_dump` + private storage to `/var/backups/ma-safaris` via `/etc/cron.d/ma-safaris-backup` (14-day retention) | Encrypt and copy offsite, then restore-test once with `scripts/verify-backup.mjs`. |
 
 ## Service operations
 
