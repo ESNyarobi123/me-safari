@@ -133,8 +133,13 @@ let ratesTouched = 0;
 let order = 0;
 
 try {
-  for (const spec of fleet) {
-    for (let unit = 1; unit <= spec.units; unit += 1) {
+  // Round-robin by unit so the first rows are one of each model: the public
+  // overview features the lowest sort orders, and a landing page showing four
+  // identical Land Cruisers reads as a placeholder rather than a fleet.
+  const maxUnits = Math.max(...fleet.map((spec) => spec.units));
+  for (let unit = 1; unit <= maxUnits; unit += 1) {
+    for (const spec of fleet) {
+      if (unit > spec.units) continue;
       order += 1;
       const slug = `${spec.key}-${String(unit).padStart(2, '0')}`;
       const data = {
