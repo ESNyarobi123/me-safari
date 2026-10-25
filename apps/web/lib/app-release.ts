@@ -2,17 +2,30 @@
  * Android distribution details — one source of truth for the landing-page
  * download popup and the /android page.
  *
- * The APK itself is published next to the static export:
- *   apps/web/public/android/ma-safaris.apk → /android/ma-safaris.apk
- * The file is intentionally not committed to git (build artifact); the release
- * step copies it into the published directory.
+ * Two per-ABI APKs are published next to the static export (a universal bundle
+ * would be ~112 MB, which is too heavy for a phone download):
+ *   /android/ma-safaris-arm64.apk  — arm64-v8a, every modern phone
+ *   /android/ma-safaris-arm32.apk  — armeabi-v7a, older 32-bit devices
+ *
+ * The APKs are build artifacts, not committed to git; the release step copies
+ * them into the published directory.
  */
 export const ANDROID_APP = {
   version: '1.0.0',
-  fileName: 'ma-safaris.apk',
-  downloadPath: '/android/ma-safaris.apk',
-  minimumAndroid: '8.0',
   packageId: 'tz.meandadventure.safaris',
+  minimumAndroid: '7.0',
+  primary: {
+    abi: 'arm64-v8a',
+    label: '64-bit phones (most devices)',
+    path: '/android/ma-safaris-arm64.apk',
+    sizeLabel: '52 MB',
+  },
+  legacy: {
+    abi: 'armeabi-v7a',
+    label: 'Older 32-bit phones',
+    path: '/android/ma-safaris-arm32.apk',
+    sizeLabel: '45 MB',
+  },
 } as const;
 
 /** Marketing page that holds the download button, install steps and notes. */

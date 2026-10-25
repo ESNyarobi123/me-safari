@@ -67,7 +67,7 @@ export default function AndroidDownloadPage() {
             </p>
 
             <div className="ma-android-actions">
-              <a className="ma-btn ma-btn-orange ma-android-download" href={ANDROID_APP.downloadPath} download>
+              <a className="ma-btn ma-btn-orange ma-android-download" href={ANDROID_APP.primary.path} download>
                 <Icon name="download" />
                 <span>Download APK</span>
               </a>
@@ -77,8 +77,13 @@ export default function AndroidDownloadPage() {
             <ul className="ma-android-meta" aria-label="Release details">
               <li><strong>v{ANDROID_APP.version}</strong><span>Latest release</span></li>
               <li><strong>Android {ANDROID_APP.minimumAndroid}+</strong><span>Minimum version</span></li>
-              <li><strong>APK</strong><span>Direct install</span></li>
+              <li><strong>{ANDROID_APP.primary.sizeLabel}</strong><span>Download size</span></li>
             </ul>
+
+            <p className="ma-android-alt">
+              On an older 32-bit phone? Use the{' '}
+              <a href={ANDROID_APP.legacy.path} download>32-bit APK ({ANDROID_APP.legacy.sizeLabel})</a>.
+            </p>
           </div>
 
           <div className="ma-android-stage" aria-hidden="true">
