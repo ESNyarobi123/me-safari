@@ -201,19 +201,21 @@ function Modal({ title, children, close }: { title: string; children: React.Reac
   );
 }
 
-export default function Landing({ initialPackages, initialCompany, initialDestinations, initialLive }: {
+export default function Landing({ initialPackages, initialCompany, initialDestinations, initialLive, initialServices, initialRentals }: {
   initialPackages?: CatalogPackage[];
   initialCompany?: Company;
   initialDestinations?: Destination[];
   initialLive?: boolean;
+  initialServices?: Service[];
+  initialRentals?: RentalOverview | null;
 } = {}) {
   const [packages, setPackages] = useState<CatalogPackage[]>(initialPackages?.length ? initialPackages : fallbackPackages);
   const [company, setCompany] = useState<Company>(initialCompany ?? companyFallback);
-  const [services, setServices] = useState<Service[]>(fallbackServices);
+  const [services, setServices] = useState<Service[]>(initialServices?.length ? initialServices : fallbackServices);
   const [destinations, setDestinations] = useState<Destination[]>(initialDestinations ?? []);
   const [release, setRelease] = useState<AppRelease>({ state: 'unavailable', appStoreUrl: null, playStoreUrl: null });
   const [content, setContent] = useState<LandingContent>({});
-  const [rentals, setRentals] = useState<RentalOverview>(fallbackRentals);
+  const [rentals, setRentals] = useState<RentalOverview>(initialRentals ? { ...fallbackRentals, ...initialRentals } : fallbackRentals);
   const [catalogStatus, setCatalogStatus] = useState<'loading' | 'live' | 'fallback'>(initialPackages?.length && initialLive ? 'live' : 'loading');
   const [filter, setFilter] = useState('all');
   const [selected, setSelected] = useState<CatalogPackage | null>(null);

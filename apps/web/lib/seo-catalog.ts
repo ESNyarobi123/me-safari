@@ -13,6 +13,8 @@ import {
   type CatalogPackage,
   type Company,
   type Destination,
+  type RentalOverview,
+  type Service,
 } from './catalog';
 
 const API = (process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:4000/v1').replace(/\/$/, '');
@@ -81,6 +83,8 @@ export interface SeoCatalog {
   packages: CatalogPackage[];
   destinations: Destination[];
   company: Company;
+  services: Service[];
+  rentals: RentalOverview | null;
   live: boolean;
 }
 
@@ -88,10 +92,12 @@ export interface SeoCatalog {
 let snapshot: Promise<SeoCatalog> | null = null;
 
 async function buildSnapshot(): Promise<SeoCatalog> {
-  const [packageResult, destinationResult, companyResult] = await Promise.all([
+  const [packageResult, destinationResult, companyResult, serviceResult, rentalResult] = await Promise.all([
     readAll<CatalogPackage>('packages'),
     readAll<Destination>('destinations'),
     read<Company>('company'),
+    read<Service[] | { items: Service[] }>('services'),
+    read<RentalOverview>('rentals/overview'),
   ]);
   const livePackages = packageResult ?? [];
   const liveDestinations = destinationResult ?? [];
@@ -105,6 +111,8 @@ async function buildSnapshot(): Promise<SeoCatalog> {
     packages: livePackages.length ? livePackages : fallbackPackages,
     destinations,
     company: companyResult ? { ...companyFallback, ...companyResult } : companyFallback,
+    services: asList<Service>(serviceResult ?? []),
+    rentals: rentalResult ?? null,
     live: livePackages.length > 0,
   };
 }
