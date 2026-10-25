@@ -2,6 +2,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Icon from './Icon';
 import InquiryForm from './InquiryForm';
+import AppDownloadPopup from './AppDownloadPopup';
+import { ANDROID_APP, ANDROID_PAGE_PATH } from '../lib/app-release';
 import {
   type CatalogPackage, type Company, type Service, type Destination, type AppRelease, type LandingContent, type RentalOverview,
   companyFallback, fallbackPackages, fallbackServices, fallbackRentals, photoCredits,
@@ -1015,6 +1017,13 @@ export default function Landing({ initialPackages, initialCompany, initialDestin
                 <div className="ma-download-pedestal">
                   <p className="ma-download-bar">Available on iPhone &amp; Android:</p>
                   <div className="ma-stores">
+                    <a className="ma-store-badge ma-apk-badge" href={ANDROID_PAGE_PATH}>
+                      <span className="ma-store-icon" aria-hidden="true"><Icon name="download" /></span>
+                      <span className="ma-store-text">
+                        <small>ANDROID · v{ANDROID_APP.version}</small>
+                        <strong>Download APK</strong>
+                      </span>
+                    </a>
                     <StoreBadge kind="google" href={playUrl} onComingSoon={() => setStoreNotice('store')}/>
                     <StoreBadge kind="apple" href={appUrl} onComingSoon={() => setStoreNotice('store')}/>
                   </div>
@@ -1276,6 +1285,7 @@ export default function Landing({ initialPackages, initialCompany, initialDestin
           )}
         </Modal>
       ) : null}
+      <AppDownloadPopup />
     </div>
   );
 }

@@ -14,6 +14,7 @@ const paths: Record<string, string> = {
  calendar: 'M7 3v3m10-3v3M4 9h16M6 5h12a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm2 8h2v2H8v-2Zm6 0h2v2h-2v-2Zm-6 4h2v2H8v-2Zm6 0h2v2h-2v-2Z',
  search: 'M11 3a8 8 0 1 0 5.3 14l4 4 1.4-1.4-4-4A8 8 0 0 0 11 3Zm0 2a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z',
  bag: 'M7 7V6a5 5 0 0 1 10 0v1h3l1 13H3L4 7h3Zm2 0h6V6a3 3 0 0 0-6 0v1Zm-4.2 2-.6 9h15.6l-.6-9H4.8Z',
- play: 'M8 5v14l11-7L8 5Z',
+  play: 'M8 5v14l11-7L8 5Z',
+  download: 'M12 3v12m-5-5 5 5 5-5M4 19h16',
 };
 export default function Icon({ name }: { name: string }) { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d={paths[name] || paths.compass}/></svg>; }
